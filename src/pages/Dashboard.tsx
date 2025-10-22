@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store } from 'lucide-react';
+import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, Home } from 'lucide-react';
 import KPISummary from '@/components/dashboard/KPISummary';
 import FarmersPanel from '@/components/dashboard/FarmersPanel';
 import VendorMarketplace from '@/components/dashboard/VendorMarketplace';
@@ -28,26 +29,34 @@ const Dashboard = () => {
       <header className="border-b bg-card shadow-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">TerraSync Co-op Manager</h1>
-              <div className="flex items-center gap-4 mt-1">
-                <span className="text-sm text-muted-foreground">Mindanao Valley Co-operative</span>
-                <Badge variant="outline">Season: Wet 2024</Badge>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => window.location.href = '/vendor-dashboard'}
-                  className="ml-4"
-                >
-                  Switch to Vendor View
+            <div className="flex items-center gap-4">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Home className="h-4 w-4" />
+                  Home
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => window.location.href = '/farmer-dashboard'}
-                >
-                  Switch to Farmer View
-                </Button>
+              </Link>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">TerraSync Co-op Manager</h1>
+                <div className="flex items-center gap-4 mt-1">
+                  <span className="text-sm text-muted-foreground">Mindanao Valley Co-operative</span>
+                  <Badge variant="outline">Season: Wet 2024</Badge>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => window.location.href = '/vendor-dashboard'}
+                    className="ml-4"
+                  >
+                    Switch to Vendor View
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => window.location.href = '/farmer-dashboard'}
+                  >
+                    Switch to Farmer View
+                  </Button>
+                </div>
               </div>
             </div>
             
