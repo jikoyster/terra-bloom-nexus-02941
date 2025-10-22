@@ -27,36 +27,41 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card shadow-sm">
+        {/* Top Bar - Logo and Home Link */}
+        <div className="border-b border-border bg-background">
+          <div className="container mx-auto px-6 py-3">
+            <Link to="/" className="flex items-center justify-center gap-3 hover:opacity-80 transition-opacity">
+              <Leaf className="h-6 w-6 text-green-600" />
+              <h1 className="text-2xl font-bold">
+                Terra<span className="text-green-600">Sync</span>
+              </h1>
+            </Link>
+          </div>
+        </div>
+        
+        {/* Main Header */}
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link to="/">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Home className="h-4 w-4" />
-                  Home
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Co-op Manager</h2>
+              <div className="flex items-center gap-4 mt-1">
+                <span className="text-sm text-muted-foreground">Mindanao Valley Co-operative</span>
+                <Badge variant="outline">Season: Wet 2024</Badge>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => window.location.href = '/vendor-dashboard'}
+                  className="ml-4"
+                >
+                  Switch to Vendor View
                 </Button>
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">TerraSync Co-op Manager</h1>
-                <div className="flex items-center gap-4 mt-1">
-                  <span className="text-sm text-muted-foreground">Mindanao Valley Co-operative</span>
-                  <Badge variant="outline">Season: Wet 2024</Badge>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => window.location.href = '/vendor-dashboard'}
-                    className="ml-4"
-                  >
-                    Switch to Vendor View
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => window.location.href = '/farmer-dashboard'}
-                  >
-                    Switch to Farmer View
-                  </Button>
-                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => window.location.href = '/farmer-dashboard'}
+                >
+                  Switch to Farmer View
+                </Button>
               </div>
             </div>
             
