@@ -32,6 +32,20 @@ const TerraArchitecture = () => {
 
   const layers = [
     {
+      id: 'hardware',
+      title: 'Hardware Layer',
+      subtitle: 'Physical Sensing & Collection',
+      color: 'from-green-600 to-green-700',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200',
+      components: [
+        { icon: Thermometer, name: 'Soil Sensors', desc: 'Temperature & Moisture' },
+        { icon: Bug, name: 'Pest Detection', desc: 'Berlese-Tullgren Sensors' },
+        { icon: Sun, name: 'Gomboc Sensor', desc: 'Self-Righting Environmental' },
+        { icon: Zap, name: 'Solar Relays', desc: 'Off-Grid Power & Data' }
+      ]
+    },
+    {
       id: 'edge',
       title: 'Edge & Data Processing',
       subtitle: 'Real-Time Analysis & Transmission',
@@ -85,20 +99,6 @@ const TerraArchitecture = () => {
         { icon: Shield, name: 'Blockchain Ledger', desc: 'Ownership & Credits' },
         { icon: Coins, name: 'Carbon Credits', desc: 'Environmental Impact' },
         { icon: Users, name: 'Cooperative Index', desc: 'Performance Metrics' }
-      ]
-    },
-    {
-      id: 'hardware',
-      title: 'Hardware Layer',
-      subtitle: 'Physical Sensing & Collection',
-      color: 'from-green-600 to-green-700',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
-      components: [
-        { icon: Thermometer, name: 'Soil Sensors', desc: 'Temperature & Moisture' },
-        { icon: Bug, name: 'Pest Detection', desc: 'Berlese-Tullgren Sensors' },
-        { icon: Sun, name: 'Gomboc Sensor', desc: 'Self-Righting Environmental' },
-        { icon: Zap, name: 'Solar Relays', desc: 'Off-Grid Power & Data' }
       ]
     }
   ];
