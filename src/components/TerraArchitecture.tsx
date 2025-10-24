@@ -124,6 +124,7 @@ const TerraArchitecture = () => {
       </div>
 
       {/* Layer Components */}
+      {/*
       <div className="space-y-6 mb-8">
         {layers.map((layer, index) => (
           <Card 
@@ -170,8 +171,10 @@ const TerraArchitecture = () => {
           </Card>
         ))}
       </div>
+      */}
 
       {/* Data Flow Visualization */}
+      {/*
       <Card className="border-2 border-gray-200 shadow-lg">
         <CardHeader className="bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-t-lg">
           <CardTitle className="text-xl font-bold">System Data Flows</CardTitle>
@@ -206,6 +209,7 @@ const TerraArchitecture = () => {
           </div>
         </CardContent>
       </Card>
+      */}
 
       {/* Key Features Summary */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
