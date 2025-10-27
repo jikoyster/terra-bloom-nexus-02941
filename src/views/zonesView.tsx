@@ -3,10 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { ZoneController } from '../controllers/zoneController';
 import { Zone } from '../models/zoneModel';
 
-
-
-
-
 const ZonesView = () => {
   const [zones, setZones] = useState<Zone[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +57,7 @@ const ZonesView = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Zones Management</h2>
+      <h2 className="text-2xl font-bold mb-4">Zone Management</h2>
 
       {/* Add Zone Form */}
       <div className="flex gap-2 mb-4">
