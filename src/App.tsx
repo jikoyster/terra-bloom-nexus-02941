@@ -9,6 +9,10 @@ import VendorDashboard from "./components/dashboard/VendorDashboard";
 import FarmerDashboard from "./components/dashboard/FarmerDashboard";
 import NotFound from "./pages/NotFound";
 
+//zonesView
+import ZonesView from "./views/zonesView";
+
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -24,6 +28,10 @@ const App = () => (
           <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
+
+          {/*Zones*/}
+          <Route path="/zones" element={<ZonesView />} />
+          
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

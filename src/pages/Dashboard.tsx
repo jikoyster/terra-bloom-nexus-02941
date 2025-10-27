@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +13,9 @@ import CarbonDashboard from '@/components/dashboard/CarbonDashboard';
 import FinanceDashboard from '@/components/dashboard/FinanceDashboard';
 import AdminPanel from '@/components/dashboard/AdminPanel';
 import TradingPlatform from '@/components/dashboard/TradingPlatform';
+
+//zones
+import Zones from '@/views/zonesView';
 
 const Dashboard = () => {
   const [activeView, setActiveView] = useState('overview');
