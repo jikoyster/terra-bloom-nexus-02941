@@ -17,7 +17,7 @@ import AdminPanel from '@/components/dashboard/AdminPanel';
 import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
 //zones
-import Zones from '@/views/zonesView';
+import Zones from '@/views/ZonesView';
 
 const Dashboard = () => {
   const [activeView, setActiveView] = useState('overview');

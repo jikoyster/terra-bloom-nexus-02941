@@ -55,7 +55,7 @@ const ZonesView = () => {
 
   if (loading) 
     return <center>
-            <i class="fas fa-spinner fa-pulse"></i>
+            <i className="fas fa-spinner fa-pulse"></i>
             HUWAT HA!
         </center> ;
 

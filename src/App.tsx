@@ -10,9 +10,10 @@ import FarmerDashboard from "./components/dashboard/FarmerDashboard";
 import NotFound from "./pages/NotFound";
 
 //zonesView
-import ZonesView from "./views/zonesView";
+import ZonesView from "./views/ZonesView";
 
-
+//login page
+import LoginPage from "./pages/Login";
 const queryClient = new QueryClient();
 
 const App = () => (
