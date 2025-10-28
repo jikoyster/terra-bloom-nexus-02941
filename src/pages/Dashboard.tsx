@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate  } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -16,31 +16,37 @@ import FinanceDashboard from '@/components/dashboard/FinanceDashboard';
 import AdminPanel from '@/components/dashboard/AdminPanel';
 import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
-//zones
-import Zones from '@/views/ZonesView';
-
 const Dashboard = () => {
   const [activeView, setActiveView] = useState('overview');
   const [user, setUser] = useState<any>(null);
+
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
     { id: 2, type: 'request', message: '3 loan applications pending approval', priority: 'medium' },
     { id: 3, type: 'vendor', message: 'New organic fertilizer vendor registered', priority: 'low' }
   ]);
 
-  // ✅ Set mock user once, not every render
   useEffect(() => {
-    const mockUser = {
-      id: '1234-test-user',
-      email: 'farmer@example.com',
-      user_metadata: {
-        name: 'Juan Dela Cruz',
-        role: 'Farmer',
-        region: 'Cebu',
-      },
+    const getUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error || !data?.user) {
+        console.warn("No user session found. Redirecting to login...");
+        navigate("/login"); // 🔒 Redirect if not logged in
+        return;
+      }
+
+      setUser(data.user);
+      setLoading(false);
     };
-    setUser(mockUser);
-  }, []);
+
+    getUser();
+  }, [navigate]);
+
+  
 
   if (!user) return <p className="text-center mt-20">Loading user...</p>;
 

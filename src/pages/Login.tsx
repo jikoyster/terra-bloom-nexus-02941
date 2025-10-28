@@ -1,33 +1,43 @@
 // src/pages/Login.tsx
-import React, { useState } from 'react'
-import { AuthController } from '../controllers/authController'
-import { UserModel } from '../models/userModel'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
+import { useNavigate } from 'react-router-dom';
+import { UserModel } from '../models/userModel';
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
     try {
-      const user = await AuthController.login(email, password)
-      if (user) {
-        await UserModel.saveUser(user)
-        navigate('/dashboard')
+      // ✅ Supabase login using credentials from Auth table
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data?.user) {
+        // ✅ Save user locally (for session persistence)
+        UserModel.saveUser(data.user);
+        navigate('/dashboard');
+      } else {
+        setError('No user data found.');
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed')
+      setError(err.message || 'Login failed.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -68,9 +78,13 @@ const LoginPage: React.FC = () => {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Don’t have an account? <a href="/register" className="text-green-600 hover:underline">Register</a>
+        </p>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
