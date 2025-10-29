@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { AuthController } from '../controllers/authController';
 
 import KPISummary from '@/components/dashboard/KPISummary';
 import FarmersPanel from '@/components/dashboard/FarmersPanel';
@@ -46,6 +47,10 @@ const Dashboard = () => {
     getUser();
   }, [navigate]);
 
+  const handleLogout = async () => {
+    await AuthController.logout()
+    navigate('/login')
+  };
   
 
   if (!user) return <p className="text-center mt-20">Loading user...</p>;
@@ -113,6 +118,12 @@ const Dashboard = () => {
                   Role: {user.user_metadata.role}
                 </p>
               </div>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>

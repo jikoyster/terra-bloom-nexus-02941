@@ -22,4 +22,14 @@ export const AuthController = {
     if (error) throw error
     return data.user
   },
+
+  async logout() {
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+  },
+
+  async getCurrentUser() {
+    const { data } = await supabase.auth.getUser()
+    return data.user
+  },
 }
