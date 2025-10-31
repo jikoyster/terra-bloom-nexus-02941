@@ -9,28 +9,42 @@ import {
   DollarSign,
   Package
 } from 'lucide-react'
-import { supabase } from '../../supabaseClient' // adjust path as needed
+import { supabase } from '../../supabaseClient' // adjust path if needed
 
 const KPISummary = () => {
   const [farmerCount, setFarmerCount] = useState<number | null>(null)
+  const [vendorCount, setVendorCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchFarmerCount = async () => {
-      const { count, error } = await supabase
-        .from('Users')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 2)
+    const fetchCounts = async () => {
+      try {
+        // 🔹 Count farmers (role = 2)
+        const { count: farmers, error: farmerError } = await supabase
+          .from('Users')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 2)
 
-      if (error) {
-        console.error('Supabase error fetching farmers:', error)
-      } else {
-        setFarmerCount(count)
+        if (farmerError) throw farmerError
+
+        // 🔹 Count vendors (role = 3)
+        const { count: vendors, error: vendorError } = await supabase
+          .from('Users')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 3)
+
+        if (vendorError) throw vendorError
+
+        setFarmerCount(farmers)
+        setVendorCount(vendors)
+      } catch (error) {
+        console.error('Supabase count error:', error)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
-    fetchFarmerCount()
+    fetchCounts()
   }, [])
 
   const kpis = [
@@ -44,7 +58,7 @@ const KPISummary = () => {
     },
     {
       title: 'Vendors Onboarded',
-      value: '7',
+      value: loading ? '...' : vendorCount ?? '0',
       change: '+2',
       trend: 'up',
       icon: ShoppingBag,
