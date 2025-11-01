@@ -14,6 +14,8 @@ import { supabase } from '../../supabaseClient' // adjust path if needed
 const KPISummary = () => {
   const [farmerCount, setFarmerCount] = useState<number | null>(null)
   const [vendorCount, setVendorCount] = useState<number | null>(null)
+  const [carbonCredit, setCarbonCredit] = useState<number | null>(null)
+
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -35,8 +37,19 @@ const KPISummary = () => {
 
         if (vendorError) throw vendorError
 
+        // 🔹 Get topmost carbon_credit
+        const { data: carbonData, error: carbonError } = await supabase
+          .from('Markets')
+          .select('carbon_credit')
+          .order('carbon_credit', { ascending: false }) 
+          .limit(1)
+
+        if (carbonError) throw carbonError
+        const topCarbonCredit = carbonData?.[0]?.carbon_credit || 0
+
         setFarmerCount(farmers)
         setVendorCount(vendors)
+        setCarbonCredit(topCarbonCredit)
       } catch (error) {
         console.error('Supabase count error:', error)
       } finally {
@@ -66,7 +79,7 @@ const KPISummary = () => {
     },
     {
       title: 'Carbon Credits (Q2)',
-      value: '1,870 kg CO₂',
+      value: loading ? '...' : `${carbonCredit ?? 0} tCO₂e`,
       change: '+12%',
       trend: 'up',
       icon: Leaf,
@@ -107,13 +120,16 @@ const KPISummary = () => {
             <CardContent>
               <div className="text-2xl font-bold">{kpi.value}</div>
               <div className="flex items-center text-xs text-muted-foreground">
+                {/*
                 <TrendIcon
                   className={`mr-1 h-3 w-3 ${
                     kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'
                   }`}
                 />
                 {kpi.change} from last month
+                */}
               </div>
+              
             </CardContent>
           </Card>
         )
