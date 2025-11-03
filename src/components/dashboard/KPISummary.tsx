@@ -15,6 +15,7 @@ const KPISummary = () => {
   const [farmerCount, setFarmerCount] = useState<number | null>(null)
   const [vendorCount, setVendorCount] = useState<number | null>(null)
   const [carbonCredit, setCarbonCredit] = useState<number | null>(null)
+  const [financingDisbursed, setfinancingDisbursed] = useState<number | null>(null)
 
   const [loading, setLoading] = useState(true)
 
@@ -47,9 +48,20 @@ const KPISummary = () => {
         if (carbonError) throw carbonError
         const topCarbonCredit = carbonData?.[0]?.carbon_credit || 0
 
+        // 🔹 Get topmost financing_disbursed
+        const { data: financingDisbursed, error: financingDisbursedError } = await supabase
+          .from('Markets')
+          .select('financing_disbursed')
+          .order('financing_disbursed', { ascending: false }) 
+          .limit(1)
+
+        if (carbonError) throw carbonError
+        const topFinancingDisbursed = financingDisbursed?.[0]?.financing_disbursed || 0
+
         setFarmerCount(farmers)
         setVendorCount(vendors)
         setCarbonCredit(topCarbonCredit)
+        setfinancingDisbursed(topFinancingDisbursed)
       } catch (error) {
         console.error('Supabase count error:', error)
       } finally {
@@ -87,7 +99,7 @@ const KPISummary = () => {
     },
     {
       title: 'Financing Disbursed',
-      value: '₱232,000',
+      value: loading ? '...' : `${import.meta.env.VITE_CURRENCY} ${financingDisbursed ?? 0}`,
       change: '+5%',
       trend: 'up',
       icon: DollarSign,

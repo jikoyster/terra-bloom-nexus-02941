@@ -41,6 +41,13 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      {/*
+      <center className="w-full"><a href='/'>
+          <h1 className="text-5xl font-bold text-gray-800 mb-4">
+            Terra<span className="text-green-600">Sync</span>
+          </h1>
+        </a></center>
+        */}
       <form
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm"
