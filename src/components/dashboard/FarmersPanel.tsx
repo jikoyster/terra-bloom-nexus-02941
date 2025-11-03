@@ -1,59 +1,82 @@
+import React, { useEffect, useState } from 'react'
+import { supabase } from '../../supabaseClient'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import {
+  TrendingUp,
+  MapPin,
+  AlertTriangle,
+  CheckCircle
+} from 'lucide-react'
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, TrendingDown, MapPin, AlertTriangle, CheckCircle } from 'lucide-react';
+const getRiskBadge = (risk: string) => {
+  const colors = {
+    Low: 'bg-green-100 text-green-800',
+    Medium: 'bg-yellow-100 text-yellow-800',
+    High: 'bg-red-100 text-red-800'
+  }
+  return colors[risk as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+}
 
 const FarmersPanel = () => {
-  const farmers = [
-    {
-      id: 1,
-      name: 'Maria Santos',
-      location: 'Plot A-12',
-      crop: 'Rice',
-      yield: '4.2 tons/ha',
-      profitability: 85,
-      financing: 'Eligible',
-      carbonContrib: '120 kg CO₂',
-      insurance: 'Active',
-      riskLevel: 'Low'
-    },
-    {
-      id: 2,
-      name: 'Juan dela Cruz',
-      location: 'Plot B-08',
-      crop: 'Corn',
-      yield: '3.8 tons/ha',
-      profitability: 72,
-      financing: 'Pending',
-      carbonContrib: '95 kg CO₂',
-      insurance: 'Claim Filed',
-      riskLevel: 'Medium'
-    },
-    {
-      id: 3,
-      name: 'Rosa Mendoza',
-      location: 'Plot C-15',
-      crop: 'Vegetables',
-      yield: '8.5 tons/ha',
-      profitability: 92,
-      financing: 'Approved',
-      carbonContrib: '180 kg CO₂',
-      insurance: 'Active',
-      riskLevel: 'Low'
-    }
-  ];
+  const [farmers, setFarmers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const getRiskBadge = (risk: string) => {
-    const colors = {
-      'Low': 'bg-green-100 text-green-800',
-      'Medium': 'bg-yellow-100 text-yellow-800',
-      'High': 'bg-red-100 text-red-800'
-    };
-    return colors[risk as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  useEffect(() => {
+    
+  const fetchFarmers = async () => {
+    // 1️⃣ Get all users with role = 2 (farmers)
+    const { data: users, error: usersError } = await supabase
+      .from('Users')
+      .select('id, name, role, farm')
+      .eq('role', 2);
+
+    if (usersError) {
+      console.error('Error fetching users:', usersError);
+      setLoading(false);
+      return;
+    }
+
+    // 2️⃣ For each user, fetch the farm by farm_id
+    const farmersWithFarms = await Promise.all(
+      users.map(async (user) => {
+        const { data: farm, error: farmError } = await supabase
+          .from('Farm')
+          .select('farm_id, name, region, crops')
+          .eq('farm_id', user.farm)
+          .single();
+
+        if (farmError) {
+          console.warn(`No farm found for user ${user.id}`);
+        }
+
+        return { ...user, farm };
+      })
+    );
+
+    console.log('✅ Farmers with farms:', farmersWithFarms);
+
+    setFarmers(farmersWithFarms);
+    setLoading(false);
   };
+
+  fetchFarmers();
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -110,70 +133,96 @@ const FarmersPanel = () => {
       <Card>
         <CardHeader>
           <CardTitle>Farmer Performance Overview</CardTitle>
-          <CardDescription>Track yield, profitability, and risk metrics for all farmers</CardDescription>
+          <CardDescription>
+            Track yield, profitability, and risk metrics for all farmers
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Farmer</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Crop</TableHead>
-                <TableHead>Yield</TableHead>
-                <TableHead>Profitability</TableHead>
-                <TableHead>Financing</TableHead>
-                <TableHead>Carbon</TableHead>
-                <TableHead>Insurance</TableHead>
-                <TableHead>Risk</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {farmers.map((farmer) => (
-                <TableRow key={farmer.id}>
-                  <TableCell className="font-medium">{farmer.name}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
-                      {farmer.location}
-                    </div>
-                  </TableCell>
-                  <TableCell>{farmer.crop}</TableCell>
-                  <TableCell>{farmer.yield}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <div className="w-12 h-2 bg-gray-200 rounded mr-2">
-                        <div 
-                          className="h-2 bg-green-500 rounded" 
-                          style={{ width: `${farmer.profitability}%` }}
-                        />
-                      </div>
-                      {farmer.profitability}%
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={farmer.financing === 'Approved' ? 'default' : 'secondary'}>
-                      {farmer.financing}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{farmer.carbonContrib}</TableCell>
-                  <TableCell>
-                    <Badge variant={farmer.insurance === 'Active' ? 'default' : 'destructive'}>
-                      {farmer.insurance}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getRiskBadge(farmer.riskLevel)}>
-                      {farmer.riskLevel}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm">View Details</Button>
-                  </TableCell>
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Loading farmers...</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Farmer</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Crops</TableHead>
+                  <TableHead>Yield</TableHead>
+                  <TableHead>Profitability</TableHead>
+                  <TableHead>Financing</TableHead>
+                  <TableHead>Carbon</TableHead>
+                  <TableHead>Insurance</TableHead>
+                  <TableHead>Risk</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                
+                {farmers.length === 0 ? (
+  <TableRow>
+    <TableCell colSpan={10} className="text-center text-muted-foreground">
+      No farmers found
+    </TableCell>
+  </TableRow>
+) : (
+  farmers.map((farmer) => (
+    <TableRow key={farmer.id}>
+      <TableCell className="font-medium">{farmer.name}</TableCell>
+      <TableCell>
+        <div className="flex items-center">
+          <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
+          { farmer.farm?.name || '—' } <br />
+          { '— '+farmer.farm?.region || '—' }
+        </div>
+      </TableCell>
+      <TableCell>{farmer.farm?.crops || '—'}</TableCell>
+      <TableCell>
+        <div className="flex items-center">
+          <div className="w-12 h-2 bg-gray-200 rounded mr-2">
+            <div
+              className="h-2 bg-green-500 rounded"
+              style={{ width: `${farmer.farm?.profitability || 0}%` }}
+            />
+          </div>
+          {farmer.farm?.profitability || 0}%
+        </div>
+      </TableCell>
+      <TableCell>
+        <Badge
+          variant={
+            farmer.zone?.financing === 'Approved' ? 'default' : 'secondary'
+          }
+        >
+          {farmer.zone?.financing || 'Pending'}
+        </Badge>
+      </TableCell>
+      <TableCell>{farmer.zone?.carbonContrib || '0 kg CO₂'}</TableCell>
+      <TableCell>
+        <Badge
+          variant={
+            farmer.zone?.insurance === 'Active' ? 'default' : 'destructive'
+          }
+        >
+          {farmer.zone?.insurance || 'Inactive'}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <Badge className={getRiskBadge(farmer.zone?.riskLevel || 'Low')}>
+          {farmer.zone?.riskLevel || 'Low'}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <Button variant="outline" size="sm">
+          View Details
+        </Button>
+      </TableCell>
+    </TableRow>
+  ))
+)}
+
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 
@@ -181,7 +230,9 @@ const FarmersPanel = () => {
       <Card>
         <CardHeader>
           <CardTitle>ERP Integration - Field Activity Logs</CardTitle>
-          <CardDescription>Real-time tracking of farming activities and costs</CardDescription>
+          <CardDescription>
+            Real-time tracking of farming activities and costs
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -190,7 +241,9 @@ const FarmersPanel = () => {
                 <CheckCircle className="h-5 w-5 text-green-500" />
                 <div>
                   <p className="font-medium">Fertilizer Application - Plot A-12</p>
-                  <p className="text-sm text-muted-foreground">Cost: ₱2,400 | Applied: 50kg organic compost</p>
+                  <p className="text-sm text-muted-foreground">
+                    Cost: ₱2,400 | Applied: 50kg organic compost
+                  </p>
                 </div>
               </div>
               <Badge>Completed</Badge>
@@ -200,7 +253,9 @@ const FarmersPanel = () => {
                 <AlertTriangle className="h-5 w-5 text-yellow-500" />
                 <div>
                   <p className="font-medium">Pest Control - Plot B-08</p>
-                  <p className="text-sm text-muted-foreground">Cost: ₱1,200 | Scheduled for tomorrow</p>
+                  <p className="text-sm text-muted-foreground">
+                    Cost: ₱1,200 | Scheduled for tomorrow
+                  </p>
                 </div>
               </div>
               <Badge variant="secondary">Pending</Badge>
@@ -209,7 +264,7 @@ const FarmersPanel = () => {
         </CardContent>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default FarmersPanel;
+export default FarmersPanel
