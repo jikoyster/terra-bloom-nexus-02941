@@ -1,50 +1,61 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import VendorStats from './vendor/VendorStats';
-import VendorSearch from './vendor/VendorSearch';
-import VendorTable from './vendor/VendorTable';
-import PendingVendorApplications from './vendor/PendingVendorApplications';
+import React, { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
+import { supabase } from '../../supabaseClient'
+import VendorStats from './vendor/VendorStats'
+import VendorSearch from './vendor/VendorSearch'
+import VendorTable from './vendor/VendorTable'
+import PendingVendorApplications from './vendor/PendingVendorApplications'
 
 const VendorMarketplace = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const vendors = [
-    {
-      id: 1,
-      name: 'AgriSupply Pro',
-      category: 'Seeds',
-      products: ['Rice Seeds', 'Corn Seeds', 'Vegetable Seeds'],
-      stock: 'High',
-      rating: 4.8,
-      eoqMatches: 6,
-      location: 'Cagayan de Oro',
-      verified: true
-    },
-    {
-      id: 2,
-      name: 'Organic Solutions Inc',
-      category: 'Fertilizer',
-      products: ['Organic Compost', 'Bio-fertilizer', 'Liquid Nutrients'],
-      stock: 'Medium',
-      rating: 4.6,
-      eoqMatches: 3,
-      location: 'Bukidnon',
-      verified: true
-    },
-    {
-      id: 3,
-      name: 'GreenPack Materials',
-      category: 'Packaging',
-      products: ['Sacks', 'Containers', 'Labels'],
-      stock: 'Low',
-      rating: 4.2,
-      eoqMatches: 2,
-      location: 'Davao',
-      verified: false
+  const [searchTerm, setSearchTerm] = useState('')
+  const [vendors, setVendors] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchVendors = async () => {
+      setLoading(true)
+
+      // Fetch from Vendor table, joining with VendorCategory
+      const { data, error } = await supabase
+        .from('Vendor')
+        .select(`
+          id,
+          name,
+          products,
+          stock,
+          rating,
+          eoq_matches,
+          location,
+          verified,
+          category:VendorCategory(id, name)
+        `)
+
+      if (error) {
+        console.error('Error fetching vendors:', error)
+      } else {
+        // Transform product strings into arrays if stored as comma-separated values
+        const formatted = data.map((v) => ({
+          ...v,
+          products: typeof v.products === 'string'
+            ? v.products.split(',').map((p: string) => p.trim())
+            : v.products
+        }))
+        setVendors(formatted)
+      }
+
+      setLoading(false)
     }
-  ];
+
+    fetchVendors()
+  }, [])
+
+  // Optional filtering for search input
+  const filteredVendors = vendors.filter((vendor) =>
+    vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vendor.category?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vendor.location.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className="space-y-6">
@@ -67,12 +78,16 @@ const VendorMarketplace = () => {
       <VendorStats />
 
       {/* Vendors Table */}
-      <VendorTable vendors={vendors} />
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Loading vendors...</p>
+      ) : (
+        <VendorTable vendors={filteredVendors} /> 
+      )}
 
       {/* Pending Vendor Applications */}
-      <PendingVendorApplications />
+      {/*<PendingVendorApplications />*/} <br className='h-550px' />
     </div>
-  );
-};
+  )
+}
 
-export default VendorMarketplace;
+export default VendorMarketplace

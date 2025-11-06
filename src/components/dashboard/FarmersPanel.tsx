@@ -187,7 +187,7 @@ const FarmersPanel = () => {
                         </div>
                       </TableCell>
                       <TableCell>{farmer.farm?.crops || '—'}</TableCell>
-                      <TableCell>{farmer.report?.yield || '—'}</TableCell>
+                      <TableCell>{farmer.report?.yield || '—'} t/ha</TableCell>
                       <TableCell>
                         <div className="flex items-center">
                           <div className="w-12 h-2 bg-gray-200 rounded mr-2">
@@ -241,7 +241,8 @@ const FarmersPanel = () => {
         </CardContent>
       </Card>
 
-      {/* ERP Integration Preview */}
+
+      {/* ERP Integration Preview 
       <Card>
         <CardHeader>
           <CardTitle>ERP Integration - Field Activity Logs</CardTitle>
@@ -278,6 +279,7 @@ const FarmersPanel = () => {
           </div>
         </CardContent>
       </Card>
+      */}
     </div>
   )
 }
