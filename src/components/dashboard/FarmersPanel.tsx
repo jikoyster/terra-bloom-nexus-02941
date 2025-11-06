@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import CountUp from 'react-countup'
+
 import { supabase } from '../../supabaseClient'
 import {
   Card,
@@ -37,6 +39,13 @@ const FarmersPanel = () => {
   const [farmers, setFarmers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
+
+  // ✅ New summary states
+      const [avgYield, setAvgYield] = useState(0)
+      const [avgProfit, setAvgProfit] = useState(0)
+      const [totalCarbon, setTotalCarbon] = useState(0)
+      const [insuranceClaims, setInsuranceClaims] = useState(0)
+
   useEffect(() => {
     const fetchFarmers = async () => {
       // Step 1️⃣ Get all users with role = 2 (farmers)
@@ -44,6 +53,9 @@ const FarmersPanel = () => {
         .from('Users')
         .select('id, name, role, farm')
         .eq('role', 2)
+
+      
+
 
       if (usersError) {
         console.error('Error fetching users:', usersError)
@@ -82,6 +94,24 @@ const FarmersPanel = () => {
         })
       )
 
+      // ✅ Compute summary stats
+      const validReports = farmersWithDetails
+        .map((f) => f.report)
+        .filter((r) => r !== null && r !== undefined)
+      
+      const totalYield = validReports.reduce((sum, r) => sum + (r.yield || 0), 0)
+      const totalProfit = validReports.reduce((sum, r) => sum + (r.profitability || 0), 0)
+      const totalCarbonSum = validReports.reduce((sum, r) => sum + (r.carbon || 0), 0)
+      const insuranceCount = validReports.filter(
+        (r) => r.insurance && r.insurance !== 'Inactive'
+      ).length
+
+      setAvgYield(validReports.length ? totalYield / validReports.length : 0)
+      setAvgProfit(validReports.length ? totalProfit / validReports.length : 0)
+      setTotalCarbon(totalCarbonSum)
+      setInsuranceClaims(insuranceCount)
+
+
       console.log('✅ Farmers with details:', farmersWithDetails)
       setFarmers(farmersWithDetails)
       setLoading(false)
@@ -99,10 +129,12 @@ const FarmersPanel = () => {
             <CardTitle className="text-sm font-medium">Avg Yield This Season</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5.5 tons/ha</div>
+            <div className="text-2xl font-bold">
+              <CountUp end={avgYield} duration={2} decimals={1} /> tons/ha
+            </div>
             <div className="flex items-center text-xs text-green-600">
               <TrendingUp className="mr-1 h-3 w-3" />
-              +12% vs last season
+              Based on latest farm reports
             </div>
           </CardContent>
         </Card>
@@ -112,10 +144,12 @@ const FarmersPanel = () => {
             <CardTitle className="text-sm font-medium">Avg Profitability Index</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">83%</div>
+            <div className="text-2xl font-bold">
+              <CountUp end={avgProfit} duration={2} />%
+            </div>
             <div className="flex items-center text-xs text-green-600">
               <TrendingUp className="mr-1 h-3 w-3" />
-              +5% improvement
+              Across all active farms
             </div>
           </CardContent>
         </Card>
@@ -125,7 +159,9 @@ const FarmersPanel = () => {
             <CardTitle className="text-sm font-medium">Carbon Contribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,245 kg CO₂</div>
+            <div className="text-2xl font-bold">
+              <CountUp end={totalCarbon} duration={2} separator="," /> kg CO₂
+            </div>
             <div className="text-xs text-muted-foreground">Total offset this quarter</div>
           </CardContent>
         </Card>
@@ -135,8 +171,10 @@ const FarmersPanel = () => {
             <CardTitle className="text-sm font-medium">Insurance Claims</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <div className="text-xs text-muted-foreground">Pending validation</div>
+            <div className="text-2xl font-bold"> 
+              <CountUp end={insuranceClaims} duration={2} separator="," />
+            </div>
+            <div className="text-xs text-muted-foreground">Active insurance coverage</div>
           </CardContent>
         </Card>
       </div>

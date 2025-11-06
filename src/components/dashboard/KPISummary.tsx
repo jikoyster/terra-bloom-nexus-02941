@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import CountUp from 'react-countup'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   TrendingUp,
@@ -91,7 +93,8 @@ const KPISummary = () => {
     },
     {
       title: 'Carbon Credits (Q2)',
-      value: loading ? '...' : `${carbonCredit ?? 0} tCO₂e`,
+      value: loading ? '...' : `${carbonCredit ?? 0} `,
+      unit: 'tCO₂e',
       change: '+12%',
       trend: 'up',
       icon: Leaf,
@@ -99,7 +102,8 @@ const KPISummary = () => {
     },
     {
       title: 'Financing Disbursed',
-      value: loading ? '...' : `${import.meta.env.VITE_CURRENCY} ${financingDisbursed ?? 0}`,
+      value: loading ? '...' : `${financingDisbursed ?? 0}`,
+      unit: `${import.meta.env.VITE_CURRENCY}`,
       change: '+5%',
       trend: 'up',
       icon: DollarSign,
@@ -107,7 +111,8 @@ const KPISummary = () => {
     },
     {
       title: 'EOQ Fulfilled via Vendors',
-      value: '83%',
+      value: '83',
+      unit: '%',
       change: '+7%',
       trend: 'up',
       icon: Package,
@@ -130,7 +135,9 @@ const KPISummary = () => {
               <Icon className={`h-4 w-4 ${kpi.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
+              <div className="text-2xl font-bold">
+                <CountUp end={kpi.value} duration={2} separator="," /> {kpi.unit || ''}
+              </div>
               <div className="flex items-center text-xs text-muted-foreground">
                 {/*
                 <TrendIcon
