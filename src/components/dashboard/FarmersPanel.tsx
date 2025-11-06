@@ -38,44 +38,56 @@ const FarmersPanel = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    
-  const fetchFarmers = async () => {
-    // 1️⃣ Get all users with role = 2 (farmers)
-    const { data: users, error: usersError } = await supabase
-      .from('Users')
-      .select('id, name, role, farm')
-      .eq('role', 2);
+    const fetchFarmers = async () => {
+      // Step 1️⃣ Get all users with role = 2 (farmers)
+      const { data: users, error: usersError } = await supabase
+        .from('Users')
+        .select('id, name, role, farm')
+        .eq('role', 2)
 
-    if (usersError) {
-      console.error('Error fetching users:', usersError);
-      setLoading(false);
-      return;
+      if (usersError) {
+        console.error('Error fetching users:', usersError)
+        setLoading(false)
+        return
+      }
+
+      // Step 2️⃣ For each user, fetch farm and its report
+      const farmersWithDetails = await Promise.all(
+        users.map(async (user) => {
+          // Fetch farm info
+          const { data: farm, error: farmError } = await supabase
+            .from('Farm')
+            .select('farm_id, name, region, crops')
+            .eq('farm_id', user.farm)
+            .single()
+
+          if (farmError) {
+            console.warn(`No farm found for user ${user.id}`)
+          }
+
+          // Fetch latest farm report
+          const { data: report, error: reportError } = await supabase
+            .from('Farm_reports')
+            .select('yield, profitability, financing, carbon, insurance, risk_level')
+            .eq('farm_id', user.farm)
+            .order('created_at', { ascending: false })
+            .limit(10)
+            .single(0)
+
+          if (reportError) {
+            console.warn(`No farm report for farm ${user.farm}`)
+          }
+
+          return { ...user, farm, report }
+        })
+      )
+
+      console.log('✅ Farmers with details:', farmersWithDetails)
+      setFarmers(farmersWithDetails)
+      setLoading(false)
     }
 
-    // 2️⃣ For each user, fetch the farm by farm_id
-    const farmersWithFarms = await Promise.all(
-      users.map(async (user) => {
-        const { data: farm, error: farmError } = await supabase
-          .from('Farm')
-          .select('farm_id, name, region, crops')
-          .eq('farm_id', user.farm)
-          .single();
-
-        if (farmError) {
-          console.warn(`No farm found for user ${user.id}`);
-        }
-
-        return { ...user, farm };
-      })
-    );
-
-    console.log('✅ Farmers with farms:', farmersWithFarms);
-
-    setFarmers(farmersWithFarms);
-    setLoading(false);
-  };
-
-  fetchFarmers();
+    fetchFarmers()
   }, [])
 
   return (
@@ -157,69 +169,72 @@ const FarmersPanel = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                
                 {farmers.length === 0 ? (
-  <TableRow>
-    <TableCell colSpan={10} className="text-center text-muted-foreground">
-      No farmers found
-    </TableCell>
-  </TableRow>
-) : (
-  farmers.map((farmer) => (
-    <TableRow key={farmer.id}>
-      <TableCell className="font-medium">{farmer.name}</TableCell>
-      <TableCell>
-        <div className="flex items-center">
-          <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
-          { farmer.farm?.name || '—' } <br />
-          { '— '+farmer.farm?.region || '—' }
-        </div>
-      </TableCell>
-      <TableCell>{farmer.farm?.crops || '—'}</TableCell>
-      <TableCell>
-        <div className="flex items-center">
-          <div className="w-12 h-2 bg-gray-200 rounded mr-2">
-            <div
-              className="h-2 bg-green-500 rounded"
-              style={{ width: `${farmer.farm?.profitability || 0}%` }}
-            />
-          </div>
-          {farmer.farm?.profitability || 0}%
-        </div>
-      </TableCell>
-      <TableCell>
-        <Badge
-          variant={
-            farmer.zone?.financing === 'Approved' ? 'default' : 'secondary'
-          }
-        >
-          {farmer.zone?.financing || 'Pending'}
-        </Badge>
-      </TableCell>
-      <TableCell>{farmer.zone?.carbonContrib || '0 kg CO₂'}</TableCell>
-      <TableCell>
-        <Badge
-          variant={
-            farmer.zone?.insurance === 'Active' ? 'default' : 'destructive'
-          }
-        >
-          {farmer.zone?.insurance || 'Inactive'}
-        </Badge>
-      </TableCell>
-      <TableCell>
-        <Badge className={getRiskBadge(farmer.zone?.riskLevel || 'Low')}>
-          {farmer.zone?.riskLevel || 'Low'}
-        </Badge>
-      </TableCell>
-      <TableCell>
-        <Button variant="outline" size="sm">
-          View Details
-        </Button>
-      </TableCell>
-    </TableRow>
-  ))
-)}
-
+                  <TableRow>
+                    <TableCell colSpan={10} className="text-center text-muted-foreground">
+                      No farmers found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  farmers.map((farmer) => (
+                    <TableRow key={farmer.id}>
+                      <TableCell className="font-medium">{farmer.name}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
+                          {farmer.farm?.name || '—'} <br />
+                          {farmer.farm?.region ? '— ' + farmer.farm.region : '—'}
+                        </div>
+                      </TableCell>
+                      <TableCell>{farmer.farm?.crops || '—'}</TableCell>
+                      <TableCell>{farmer.report?.yield || '—'}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <div className="w-12 h-2 bg-gray-200 rounded mr-2">
+                            <div
+                              className="h-2 bg-green-500 rounded"
+                              style={{ width: `${farmer.report?.profitability || 0}%` }}
+                            />
+                          </div>
+                          {farmer.report?.profitability || 0}%
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            farmer.report?.financing === 'Approved'
+                              ? 'default'
+                              : 'secondary'
+                          }
+                        >
+                          {farmer.report?.financing || 'Pending'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{farmer.report?.carbonContrib || '0 kg CO₂'}</TableCell>
+                      <TableCell className='text-center'>
+                        <Badge
+                          variant={
+                            farmer.report?.insurance === 'Active'
+                              ? 'default'
+                              : 'destructive'
+                          }
+                        >
+                          {farmer.report?.insurance || 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getRiskBadge(farmer.report?.risk_level || 'Low')}>
+                          {farmer.report?.risk_level || 'Low'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="sm">
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           )}
