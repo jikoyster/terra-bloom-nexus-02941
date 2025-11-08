@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate  } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { AuthController } from '../controllers/authController';
 
@@ -20,15 +20,12 @@ import TradingPlatform from '@/components/dashboard/TradingPlatform';
 const Dashboard = () => {
   const [activeView, setActiveView] = useState('overview');
   const [user, setUser] = useState<any>(null);
-
   const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const navigate = useNavigate();
 
-  const [notifications] = useState([
-    { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
-    { id: 2, type: 'request', message: '3 loan applications pending approval', priority: 'medium' },
-    { id: 3, type: 'vendor', message: 'New organic fertilizer vendor registered', priority: 'low' }
-  ]);
+  // ✅ Notification Toast State
+  const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
@@ -36,27 +33,41 @@ const Dashboard = () => {
 
       if (error || !data?.user) {
         console.warn("No user session found. Redirecting to login...");
-        navigate("/login"); // 🔒 Redirect if not logged in
+        navigate("/login");
         return;
       }
 
       setUser(data.user);
       setLoading(false);
+
+      // ✅ Add sample notification
+      setNotifications([
+        { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
+        { id: 2, type: 'request', message: '3 loan applications pending approval', priority: 'medium' },
+        { id: 3, type: 'vendor', message: 'New organic fertilizer vendor registered', priority: 'low' }
+      ]);
+
     };
 
     getUser();
   }, [navigate]);
 
   const handleLogout = async () => {
-    await AuthController.logout()
-    navigate('/login')
+    await AuthController.logout();
+    showToast('You have been logged out successfully.', 'info');
+    setTimeout(() => navigate('/login'), 1000);
   };
-  
+
+  // ✅ Toast function
+  const showToast = (message: string, type: string) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000); // Auto-hide after 3 seconds
+  };
 
   if (!user) return <p className="text-center mt-20">Loading user...</p>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       {/* Header */}
       <header className="border-b bg-card shadow-sm">
         <div className="border-b border-border bg-background">
@@ -78,13 +89,13 @@ const Dashboard = () => {
               </h2>
               <div className="flex items-center gap-4 mt-1">
                 <span className="text-sm text-muted-foreground">
-                  Welcome, {user.user_metadata.name} ({user.email})
+                  Logged in as <b>{user.user_metadata.name} - {user.email}</b>
                 </span>
                 <Badge variant="outline">Region: {user.user_metadata.region}</Badge>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.location.href = '/vendor-dashboard'}
+                  onClick={() => showToast('Switched to Vendor View', 'info')}
                   className="ml-4"
                 >
                   Switch to Vendor View
@@ -92,7 +103,7 @@ const Dashboard = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.location.href = '/farmer-dashboard'}
+                  onClick={() => showToast('Switched to Farmer View', 'info')}
                 >
                   Switch to Farmer View
                 </Button>
@@ -101,6 +112,7 @@ const Dashboard = () => {
 
             <div className="flex items-center gap-4">
               <div className="relative">
+                {/*
                 <Button variant="outline" size="sm" className="relative">
                   <Bell className="h-4 w-4" />
                   {notifications.length > 0 && (
@@ -109,15 +121,9 @@ const Dashboard = () => {
                     </Badge>
                   )}
                 </Button>
+                */}
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium">
-                  {user.user_metadata.name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Role: {user.user_metadata.role}
-                </p>
-              </div>
+
               <button
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
@@ -129,7 +135,7 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Tabs Navigation */}
+      {/* Tabs */}
       <div className="container mx-auto px-6 py-4">
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
           <TabsList className="grid w-full grid-cols-8">
@@ -143,37 +149,14 @@ const Dashboard = () => {
             <TabsTrigger value="admin"><Users className="h-4 w-4" /> Admin</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-6">
-            <KPISummary />
-          </TabsContent>
-
-          <TabsContent value="farmers" className="mt-6">
-            <FarmersPanel />
-          </TabsContent>
-
-          <TabsContent value="vendors" className="mt-6">
-            <VendorMarketplace />
-          </TabsContent>
-
-          <TabsContent value="erp" className="mt-6">
-            <ERPLayer />
-          </TabsContent>
-
-          <TabsContent value="carbon" className="mt-6">
-            <CarbonDashboard />
-          </TabsContent>
-
-          <TabsContent value="finance" className="mt-6">
-            <FinanceDashboard />
-          </TabsContent>
-
-          <TabsContent value="market" className="mt-6">
-            <TradingPlatform />
-          </TabsContent>
-
-          <TabsContent value="admin" className="mt-6">
-            <AdminPanel />
-          </TabsContent>
+          <TabsContent value="overview" className="mt-6"><KPISummary /></TabsContent>
+          <TabsContent value="farmers" className="mt-6"><FarmersPanel /></TabsContent>
+          <TabsContent value="vendors" className="mt-6"><VendorMarketplace /></TabsContent>
+          <TabsContent value="erp" className="mt-6"><ERPLayer /></TabsContent>
+          <TabsContent value="carbon" className="mt-6"><CarbonDashboard /></TabsContent>
+          <TabsContent value="finance" className="mt-6"><FinanceDashboard /></TabsContent>
+          <TabsContent value="market" className="mt-6"><TradingPlatform /></TabsContent>
+          <TabsContent value="admin" className="mt-6"><AdminPanel /></TabsContent>
         </Tabs>
       </div>
     </div>

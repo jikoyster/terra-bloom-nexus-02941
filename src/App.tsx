@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,7 +15,11 @@ import ZonesView from "./views/ZonesView";
 
 //login page
 import LoginPage from "./pages/Login";
+import { AlignCenter } from 'lucide-react';
 const queryClient = new QueryClient();
+
+import SignupPage from "./pages/Signup_5cad9932e1a3b7955ef4073ff0b1f312fc8433a4";
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,6 +29,14 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route
+            path="/signup/5cad9932e1a3b7955ef4073ff0b1f312fc8433a4"
+            element={
+              <React.Suspense fallback={<p className='text-center'><br /><br /><br /> Loading signup page...</p>}>
+                <SignupPage />
+              </React.Suspense>
+            }
+          />
 
           {/*login page*/}
           <Route path="/login" element={<LoginPage />} />

@@ -110,7 +110,7 @@ const KPISummary = () => {
       color: 'text-amber-600'
     },
     {
-      title: 'EOQ Fulfilled via Vendors',
+      title: 'Economic Order Quantity (EOQ)',
       value: '83',
       unit: '%',
       change: '+7%',
