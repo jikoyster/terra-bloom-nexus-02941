@@ -16,7 +16,7 @@ const VendorStats = () => {
 
       // 1️⃣ Fetch all vendors
       const { data, error } = await supabase
-        .from('Vendor')
+        .from(import.meta.env.VITE_VENDORS_TABLE)
         .select('verified, eoq_matches, rating')
 
       if (error) {

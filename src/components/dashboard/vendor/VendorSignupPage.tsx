@@ -39,7 +39,7 @@ const VendorSignupPage = () => {
     const { name, email, category, products, location, stock_level, rating, eoq_matches, verified, status} = formData
 
     // ✅ Insert vendor data into your Vendors table
-    const { error } = await supabase.from('Vendor').insert([
+    const { error } = await supabase.from(import.meta.env.VITE_VENDORS_TABLE).insert([
       { name, email, category: category, products, location, stock_level, rating, eoq_matches, verified, status }
     ])
 

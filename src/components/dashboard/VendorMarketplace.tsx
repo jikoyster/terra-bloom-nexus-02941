@@ -18,7 +18,7 @@ const VendorMarketplace = () => {
 
       // Fetch from Vendor table, joining with VendorCategory
       const { data, error } = await supabase
-        .from('Vendor')
+        .from(import.meta.env.VITE_VENDORS_TABLE)
         .select(`
           id,
           name,

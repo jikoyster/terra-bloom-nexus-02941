@@ -20,7 +20,7 @@ const queryClient = new QueryClient();
 
 import SignupPage from "./pages/Signup_5cad9932e1a3b7955ef4073ff0b1f312fc8433a4"
 import VendorSignupPage from './components/dashboard/vendor/VendorSignupPage'
-
+import VendorDetailsPage from './components/dashboard/vendor/VendorDetailsPage';
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -44,8 +44,10 @@ const App = () => (
 
           <Route path="/dashboard" element={<Dashboard />} />
 
+          {/* vendors pages */}
           <Route path="/vendor-dashboard" element={<VendorDashboard />} />
           <Route path="/vendor-signup" element={<VendorSignupPage />} />
+          <Route path="/vendors/:id" element={<VendorDetailsPage />} />
 
 
 

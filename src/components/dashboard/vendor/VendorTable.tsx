@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../../../supabaseClient'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { Link } from "react-router-dom"
 
 const VendorTable = () => {
   const [vendors, setVendors] = useState<any[]>([])
@@ -14,7 +15,7 @@ const VendorTable = () => {
       setError(null)
 
       const { data, error } = await supabase
-        .from('Vendor')
+        .from(import.meta.env.VITE_VENDORS_TABLE)
         .select(`
           id,
           name,
@@ -77,7 +78,14 @@ const VendorTable = () => {
         <TableBody>
           {vendors.map((vendor) => (
             <TableRow key={vendor.id}>
-              <TableCell className="font-medium align-top">{vendor.name}</TableCell>
+              <TableCell className="font-medium align-top">
+                <Link
+                  to={`/vendors/${vendor.id}`}
+                  className="text-green-600 hover:underline"
+                >
+                  {vendor.name}
+                </Link>
+              </TableCell>
               <TableCell className="align-top">
                 {vendor.category?.name || 'Uncategorized'}
               </TableCell>
