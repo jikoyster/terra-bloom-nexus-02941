@@ -18,7 +18,8 @@ import LoginPage from "./pages/Login";
 import { AlignCenter } from 'lucide-react';
 const queryClient = new QueryClient();
 
-import SignupPage from "./pages/Signup_5cad9932e1a3b7955ef4073ff0b1f312fc8433a4";
+import SignupPage from "./pages/Signup_5cad9932e1a3b7955ef4073ff0b1f312fc8433a4"
+import VendorSignupPage from './components/dashboard/vendor/VendorSignupPage'
 
 
 const App = () => (
@@ -42,7 +43,12 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
+
           <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+          <Route path="/vendor-signup" element={<VendorSignupPage />} />
+
+
+
           <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

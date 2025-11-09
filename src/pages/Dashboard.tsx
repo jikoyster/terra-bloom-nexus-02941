@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Header from '@/components/layout/Header';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -69,71 +71,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background relative">
       {/* Header */}
-      <header className="border-b bg-card shadow-sm">
-        <div className="border-b border-border bg-background">
-          <div className="container mx-auto px-6 py-3">
-            <Link to="/" className="flex items-center justify-center gap-3 hover:opacity-80 transition-opacity">
-              <Leaf className="h-6 w-6 text-green-600" />
-              <h1 className="text-2xl font-bold">
-                Terra<span className="text-green-600">Sync</span>
-              </h1>
-            </Link>
-          </div>
-        </div>
-
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-foreground">
-                {user.user_metadata.role} Dashboard
-              </h2>
-              <div className="flex items-center gap-4 mt-1">
-                <span className="text-sm text-muted-foreground">
-                  Logged in as <b>{user.user_metadata.name} - {user.email}</b>
-                </span>
-                <Badge variant="outline">Region: {user.user_metadata.region}</Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => showToast('Switched to Vendor View', 'info')}
-                  className="ml-4"
-                >
-                  Switch to Vendor View
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => showToast('Switched to Farmer View', 'info')}
-                >
-                  Switch to Farmer View
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                {/*
-                <Button variant="outline" size="sm" className="relative">
-                  <Bell className="h-4 w-4" />
-                  {notifications.length > 0 && (
-                    <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                      {notifications.length}
-                    </Badge>
-                  )}
-                </Button>
-                */}
-              </div>
-
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Tabs */}
       <div className="container mx-auto px-6 py-4">

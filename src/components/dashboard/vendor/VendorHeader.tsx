@@ -10,7 +10,7 @@ const VendorHeader = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">AgriSupply Pro</h1>
+            <h1 className="text-2xl font-bold text-foreground">AgriSupplysd Pro</h1>
             <div className="flex items-center gap-4 mt-1">
               <span className="text-sm text-muted-foreground">Vendor ID: VS-001</span>
               <Badge variant="outline">Mindanao Valley Co-op</Badge>
