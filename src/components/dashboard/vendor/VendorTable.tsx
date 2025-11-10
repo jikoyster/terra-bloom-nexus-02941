@@ -24,7 +24,7 @@ const VendorTable = () => {
           rating,
           eoq_matches,
           location,
-          verified,
+          status,
           category:VendorCategory(id, name)
         `)
 
@@ -100,9 +100,9 @@ const VendorTable = () => {
               <TableCell className="align-top">{vendor.location || '—'}</TableCell>
               <TableCell className="align-top text-center">
                 <Badge
-                  variant={vendor.verified ? 'default' : 'destructive'}
+                  variant={vendor.status ? 'default' : 'destructive'}
                 >
-                  {vendor.verified ? 'Verified' : 'Unverified'}
+                  {vendor.status ? 'Verified' : 'Unverified'}
                 </Badge>
               </TableCell>
             </TableRow>
