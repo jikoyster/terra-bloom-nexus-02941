@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
-const VendorSignupPage = () => {
+const VendorRegisterPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -174,4 +174,4 @@ const VendorSignupPage = () => {
   )
 }
 
-export default VendorSignupPage
+export default VendorRegisterPage

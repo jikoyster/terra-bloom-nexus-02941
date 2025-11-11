@@ -66,7 +66,7 @@ const VendorMarketplace = () => {
           <p className="text-muted-foreground">Manage and onboard supply chain partners</p>
         </div>
         <Button className="flex items-center gap-2"
-          onClick={() => window.location.href = '/vendor-signup'}>
+          onClick={() => window.location.href = '/vendor-register'}>
           <Plus className="h-4 w-4" />
           Onboard New Vendor
         </Button>

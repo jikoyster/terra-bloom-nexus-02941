@@ -10,7 +10,7 @@ import FarmerVRTEngine from './farmer/FarmerVRTEngine';
 import FarmerPestDetection from './farmer/FarmerPestDetection';
 import FarmerYieldForecast from './farmer/FarmerYieldForecast';
 import FarmerCarbonTracker from './farmer/FarmerCarbonTracker';
-import FarmerFinancing from './farmer/FarmerFinancing';
+import FarmerFinancing from './farmer/FarmerFinancing'; 
 import FarmerJournal from './farmer/FarmerJournal';
 import FarmerWorkflowTools from './farmer/FarmerWorkflowTools';
 import TradeModal from '../trade/TradeModal';
