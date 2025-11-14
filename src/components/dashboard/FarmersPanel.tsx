@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import CountUp from 'react-countup'
 
+import FarmerTable from '@/components/dashboard/farmer/FarmerTable'
+
 import { supabase } from '../../supabaseClient'
 import {
   Card,
@@ -51,11 +53,9 @@ const FarmersPanel = () => {
       // Step 1️⃣ Get all users with role = 2 (farmers)
       const { data: users, error: usersError } = await supabase
         .from('Users')
-        .select('id, name, role, farm')
+        .select(`id, name, role, 
+          farm`)
         .eq('role', 2)
-
-      
-
 
       if (usersError) {
         console.error('Error fetching users:', usersError)
@@ -181,103 +181,16 @@ const FarmersPanel = () => {
 
       {/* Farmers Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Farmer Performance Overview</CardTitle>
-          <CardDescription>
-            Track yield, profitability, and risk metrics for all farmers
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <p className="text-sm text-muted-foreground">Loading farmers...</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Farmer</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Crops</TableHead>
-                  <TableHead>Yield</TableHead>
-                  <TableHead>Profitability</TableHead>
-                  <TableHead>Financing</TableHead>
-                  <TableHead>Carbon</TableHead>
-                  <TableHead>Insurance</TableHead>
-                  <TableHead>Risk</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {farmers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={10} className="text-center text-muted-foreground">
-                      No farmers found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  farmers.map((farmer) => (
-                    <TableRow key={farmer.id}>
-                      <TableCell className="font-medium">{farmer.name}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
-                          {farmer.farm?.name || '—'} <br />
-                          {farmer.farm?.region ? '— ' + farmer.farm.region : '—'}
-                        </div>
-                      </TableCell>
-                      <TableCell>{farmer.farm?.crops || '—'}</TableCell>
-                      <TableCell>{farmer.report?.yield || '—'} t/ha</TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <div className="w-12 h-2 bg-gray-200 rounded mr-2">
-                            <div
-                              className="h-2 bg-green-500 rounded"
-                              style={{ width: `${farmer.report?.profitability || 0}%` }}
-                            />
-                          </div>
-                          {farmer.report?.profitability || 0}%
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            farmer.report?.financing === 'Approved'
-                              ? 'default'
-                              : 'secondary'
-                          }
-                        >
-                          {farmer.report?.financing || 'Pending'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{farmer.report?.carbonContrib || '0 kg CO₂'}</TableCell>
-                      <TableCell className='text-center'>
-                        <Badge
-                          variant={
-                            farmer.report?.insurance === 'Active'
-                              ? 'default'
-                              : 'destructive'
-                          }
-                        >
-                          {farmer.report?.insurance || 'Inactive'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getRiskBadge(farmer.report?.risk_level || 'Low')}>
-                          {farmer.report?.risk_level || 'Low'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm">
-                          View Details
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+  <CardHeader>
+    <CardTitle>Farmer Performance Overview</CardTitle>
+    <CardDescription>
+      Track yield, profitability, and risk metrics for all farmers
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    <FarmerTable farmers={farmers} loading={loading} />
+  </CardContent>
+</Card>
 
 
       {/* ERP Integration Preview 

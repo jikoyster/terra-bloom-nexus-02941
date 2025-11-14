@@ -8,12 +8,19 @@ import { supabase } from "@/supabaseClient";
 
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import VendorDashboard from "./components/dashboard/VendorDashboard";
+
 import FarmerDashboard from "./components/dashboard/FarmerDashboard";
+import FarmerDetailsPage from "./components/dashboard/farmer/FarmerDetailsPage";
+import FarmerEditPage from '@/components/dashboard/farmer/FarmerEditPage';
+
+import FarmDetailsPage from "./components/dashboard/farm/FarmDetailsPage";
+
 import NotFound from "./pages/NotFound";
 import ZonesView from "./views/ZonesView";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup_5cad9932e1a3b7955ef4073ff0b1f312fc8433a4";
+
+import VendorDashboard from "./components/dashboard/VendorDashboard";
 import VendorRegisterPage from './components/dashboard/vendor/VendorRegisterPage';
 import VendorDetailsPage from './components/dashboard/vendor/VendorDetailsPage';
 import VendorEditPage from './components/dashboard/vendor/VendorEditPage';
@@ -73,6 +80,12 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
 
           {/* ✅ Protected routes */}
+          <Route path="/farmer/:id" element={<ProtectedRoute><FarmerDetailsPage /></ProtectedRoute>} />
+          <Route path="/farmer/edit/:id" element={<ProtectedRoute><FarmerEditPage /></ProtectedRoute>} />
+          
+          {/* /farm routes*/}
+          <Route path="/farm/:id" element={<ProtectedRoute><FarmDetailsPage /></ProtectedRoute>} />
+
           <Route
             path="/dashboard"
             element={

@@ -3,61 +3,70 @@ import { supabase } from '../../../supabaseClient'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Link } from "react-router-dom"
+import { Button } from '@/components/ui/button'
 
 const VendorTable = () => {
   const [vendors, setVendors] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchVendors = async () => {
-      setLoading(true)
-      setError(null)
+  const fetchVendors = async () => {
+    setLoading(true)
+    setError(null)
 
-      const { data, error } = await supabase
-        .from(import.meta.env.VITE_VENDORS_TABLE)
-        .select(`
-          id,
-          name,
-          products,
-          stock_level,
-          rating,
-          eoq_matches,
-          location,
-          status,
-          category:VendorCategory(id, name)
-        `)
+    const { data, error } = await supabase
+      .from(import.meta.env.VITE_VENDORS_TABLE)
+      .select(`
+        id,
+        name,
+        products,
+        stock_level,
+        rating,
+        eoq_matches,
+        location,
+        status,
+        category:VendorCategory(id, name)
+      `)
 
-      if (error) {
-        console.error('Error fetching vendors:', error)
-        setError(error.message)
-      } else {
-        const formatted = data.map((v) => ({
-          ...v,
-          products: typeof v.products === 'string'
-            ? v.products.split(',').map((p: string) => p.trim())
-            : v.products
-        }))
-        setVendors(formatted)
-      }
-
-      setLoading(false)
+    if (error) {
+      console.error('Error fetching vendors:', error)
+      setError(error.message)
+    } else {
+      const formatted = data.map((v) => ({
+        ...v,
+        products: typeof v.products === 'string'
+          ? v.products.split(',').map((p: string) => p.trim())
+          : v.products
+      }))
+      setVendors(formatted)
     }
 
+    setLoading(false)
+  }
+
+  useEffect(() => {
     fetchVendors()
   }, [])
 
-  if (loading) {
-    return <p className="text-sm text-muted-foreground">Loading vendors...</p>
+  const handleDelete = async (vendorId: string) => {
+    if (!confirm("Are you sure you want to delete this vendor?")) return
+
+    const { error } = await supabase
+      .from(import.meta.env.VITE_VENDORS_TABLE)
+      .delete()
+      .eq('id', vendorId)
+
+    if (error) {
+      alert("Failed to delete vendor: " + error.message)
+    } else {
+      alert("Vendor deleted successfully!")
+      fetchVendors() // Refresh table
+    }
   }
 
-  if (error) {
-    return <p className="text-sm text-red-500">Error: {error}</p>
-  }
-
-  if (vendors.length === 0) {
-    return <p className="text-sm text-muted-foreground">No vendors found.</p>
-  }
+  if (loading) return <p className="text-sm text-muted-foreground">Loading vendors...</p>
+  if (error) return <p className="text-sm text-red-500">Error: {error}</p>
+  if (vendors.length === 0) return <p className="text-sm text-muted-foreground">No vendors found.</p>
 
   return (
     <div className="rounded-md border">
@@ -72,6 +81,7 @@ const VendorTable = () => {
             <TableHead>EOQ Matches</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead className="w-[5%]"> </TableHead>
           </TableRow>
         </TableHeader>
 
@@ -89,7 +99,7 @@ const VendorTable = () => {
               <TableCell className="align-top">
                 {vendor.category?.name || 'Uncategorized'}
               </TableCell>
-              <TableCell className="align-top">
+              <TableCell className="align-top space-x-1">
                 {Array.isArray(vendor.products)
                   ? vendor.products.join(', ')
                   : vendor.products || '—'}
@@ -100,10 +110,15 @@ const VendorTable = () => {
               <TableCell className="align-top">{vendor.location || '—'}</TableCell>
               <TableCell className="align-top text-center">
                 <Badge
-                  variant={vendor.status ? 'default' : 'destructive'}
+                  variant={vendor.status === 'Verified' ? 'default' : 'destructive'}
                 >
-                  {vendor.status ? 'Verified' : 'Unverified'}
+                  {vendor.status || '—'}
                 </Badge>
+              </TableCell>
+              <TableCell className="align-top text-center w-[150px]">
+                <a href="#" onClick={() => handleDelete(vendor.id)} className="ml-2 text-red-600 hover:underline">
+                  ❌
+                </a>
               </TableCell>
             </TableRow>
           ))}

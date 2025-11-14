@@ -32,7 +32,7 @@ const VendorDetailsPage = () => {
     const fetchVendor = async () => {
       const { data, error } = await supabase
         .from(import.meta.env.VITE_VENDORS_TABLE)
-        .select(`id, vendor_name: name, vendor_email: email, category: ${import.meta.env.VITE_VENDORCAT_TABLE}(id, name), location, products, stock_level, rating`)
+        .select(`id, vendor_name: name, vendor_email: email, category: ${import.meta.env.VITE_VENDORCAT_TABLE}(id, name), location, products, stock_level, rating, status`)
         .eq("id", id)
         .single();
 
@@ -86,7 +86,25 @@ const VendorDetailsPage = () => {
       <h3 className="text-sm font-semibold text-muted-foreground">Rating</h3>
       <p className="text-base font-medium text-foreground">{vendor.rating || "—"}</p>
     </div>
+
+    <div className="space-y-2">
+  <h3 className="text-sm font-semibold text-muted-foreground">Status</h3>
+  <span
+    className={`inline-block px-3 py-1 text-sm font-medium rounded-full
+      ${
+        vendor.status === "Verified"
+          ? "bg-green-100 text-green-800"
+          : vendor.status === "Unverified"
+          ? "bg-red-100 text-red-800"
+          : "bg-gray-100 text-gray-600"
+      }`}
+  >
+    {vendor.status || "—"}
+  </span>
+</div>
+
   </div>
+  
 
   <div className="pt-4 border-t border-border">
     <Button asChild variant="outline">
