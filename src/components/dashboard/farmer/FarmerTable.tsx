@@ -108,9 +108,13 @@ const FarmerTable = () => {
         <TableBody>
           {farmers.map((farmer) => (
             <TableRow key={farmer.id}>
-                <TableCell>{farmer.name}</TableCell>
                 <TableCell>
-                    <a href={`/farm/${farmer.id}`} className="text-green-600 hover:underline">{farmer.farm.name}</a> 
+                    <a href={`/farm/${farmer.id}`} className="text-green-600 hover:underline">
+                        {farmer.name}
+                    </a>
+                </TableCell>
+                <TableCell>
+                    <a href={`/farm/${farmer.farm?.farm_id}`} className="text-green-600 hover:underline">{farmer.farm.name}</a> 
                 </TableCell>
                 <TableCell>{farmer.farm?.region || '—'}</TableCell>
               <TableCell>{farmer.report?.yield ? `${farmer.report.yield} tons/ha` : '—'}</TableCell>
