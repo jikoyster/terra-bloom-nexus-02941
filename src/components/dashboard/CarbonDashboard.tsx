@@ -147,7 +147,7 @@ const CarbonDashboard = () => {
                     </TableCell>
 
                     {/* Practices */}
-                    <TableCell className="w-[30%]">
+                    <TableCell className="w-[40%]">
                       <div className="flex flex-wrap gap-1">
                         {row.practices
                           ?.split(",")                     // split the string
