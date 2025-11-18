@@ -1,288 +1,191 @@
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/supabaseClient";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Leaf, TrendingUp, DollarSign, Users, BarChart3, Eye, EyeOff } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge, Leaf, TrendingUp } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 const CarbonDashboard = () => {
-  const [showRevenue, setShowRevenue] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const farmerCarbonData = [
-    {
-      id: 1,
-      name: 'Maria Santos',
-      farm: 'Green Valley Farm',
-      hectares: 12.5,
-      carbonSequestered: 42.8, // tonnes CO2
-      creditValue: 1712, // PHP
-      practices: ['Cover Cropping', 'Composting', 'No-Till'],
-      trend: '+15%',
-      lastUpdated: '2024-07-13'
-    },
-    {
-      id: 2,
-      name: 'Juan dela Cruz',
-      farm: 'Sunrise Organics',
-      hectares: 8.3,
-      carbonSequestered: 28.6,
-      creditValue: 1144,
-      practices: ['Agroforestry', 'Biochar', 'Rotational Grazing'],
-      trend: '+22%',
-      lastUpdated: '2024-07-12'
-    },
-    {
-      id: 3,
-      name: 'Rosa Mendoza',
-      farm: 'EcoHarvest Co.',
-      hectares: 15.2,
-      carbonSequestered: 67.3,
-      creditValue: 2692,
-      practices: ['Permaculture', 'Water Conservation', 'Indigenous Seeds'],
-      trend: '+8%',
-      lastUpdated: '2024-07-13'
-    },
-    {
-      id: 4,
-      name: 'Pedro Reyes',
-      farm: 'Sustainable Fields',
-      hectares: 6.7,
-      carbonSequestered: 19.4,
-      creditValue: 776,
-      practices: ['Integrated Pest Mgmt', 'Mulching'],
-      trend: '+31%',
-      lastUpdated: '2024-07-11'
+  /** Fetch Carbon_credits + related Users + Farms */
+  const fetchData = async () => {
+    setLoading(true);
+    setError("");
+
+    const { data, error } = await supabase
+      .from("Carbon_credits")
+      .select(`
+        id,
+        farmer_id,
+        co2_sequestered,
+        practices,
+        trend,
+        performance,
+        Users (
+          id,
+          name,
+          email,
+          status,
+          last_login,
+          Roles (*),
+          Farms (*)
+        )
+      `);
+
+    if (error) {
+      setError(error.message);
+      console.error("Fetch error:", error);
+      setLoading(false);
+      return;
     }
-  ];
 
-  const totalCarbonSequestered = farmerCarbonData.reduce((sum, farmer) => sum + farmer.carbonSequestered, 0);
-  const totalCreditValue = farmerCarbonData.reduce((sum, farmer) => sum + farmer.creditValue, 0);
-  const avgSequestrationPerHa = totalCarbonSequestered / farmerCarbonData.reduce((sum, farmer) => sum + farmer.hectares, 0);
-
-  const carbonOffsetSummary = {
-    monthlyTarget: 200,
-    actualSequestered: totalCarbonSequestered,
-    projectedAnnual: totalCarbonSequestered * 8.5,
-    marketPrice: 40, // PHP per tonne CO2
-    potentialRevenue: totalCreditValue * 12
+    setData(data || []);
+    setLoading(false);
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  /** -----------------------------
+   *   SUMMARY COMPUTATIONS
+   * -----------------------------*/
+
+  const totalCarbonSequestered = data.reduce(
+    (sum, row) => sum + Number(row.co2_sequestered || 0),
+    0
+  );
+
+  const totalCreditValue = data.reduce(
+    (sum, row) => sum + Number(row.performance || 0),
+    0
+  );
+
+  const totalHectares = data.reduce(
+    (sum, row) => sum + Number(row.Users?.Farms?.hectares || 0),
+    0
+  );
+
+  const avgSequestrationPerHa =
+    totalHectares > 0 ? totalCarbonSequestered / totalHectares : 0;
+
+  /** -----------------------------
+   *   RENDER
+   * -----------------------------*/
+
   return (
-    <div className="space-y-6">
-      {/* Toggle and Overview Cards */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Carbon Credit Tracker</h2>
-        <Button
-          variant="outline"
-          onClick={() => setShowRevenue(!showRevenue)}
-          className="flex items-center gap-2"
-        >
-          {showRevenue ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          {showRevenue ? 'Hide Revenue' : 'Show Revenue'}
-        </Button>
-      </div>
+    <Card className="p-4">
+      <CardHeader>
+        <CardTitle>Carbon Credit Dashboard</CardTitle>
+      </CardHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Sequestered</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalCarbonSequestered.toFixed(1)}t</div>
-            <div className="text-xs text-green-600">CO₂ this season</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Active Farmers</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{farmerCarbonData.length}</div>
-            <div className="text-xs text-muted-foreground">Participating in program</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Avg per Hectare</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgSequestrationPerHa.toFixed(1)}t</div>
-            <div className="text-xs text-muted-foreground">CO₂/ha sequestered</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              {showRevenue ? 'Credit Value' : 'Monthly Progress'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {showRevenue ? (
-              <>
-                <div className="text-2xl font-bold text-green-600">₱{totalCreditValue.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">This season's credits</div>
-              </>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{((totalCarbonSequestered / carbonOffsetSummary.monthlyTarget) * 100).toFixed(0)}%</div>
-                <Progress value={(totalCarbonSequestered / carbonOffsetSummary.monthlyTarget) * 100} className="mt-2" />
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <CardContent>
+        {loading && <p>Loading…</p>}
+        {error && <p className="text-red-500">{error}</p>}
 
-      <Tabs defaultValue="farmers" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="farmers">Per-Farmer Tracking</TabsTrigger>
-          <TabsTrigger value="summary">Offset Summary</TabsTrigger>
-        </TabsList>
+        {!loading && data.length === 0 && (
+          <p>No records found in Carbon_credits.</p>
+        )}
 
-        <TabsContent value="farmers" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Individual Farmer Carbon Performance</CardTitle>
-              <CardDescription>Track sequestration and credit conversion by farmer</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Farmer</TableHead>
-                    <TableHead>Farm Size</TableHead>
-                    <TableHead>CO₂ Sequestered</TableHead>
-                    {showRevenue && <TableHead>Credit Value</TableHead>}
-                    <TableHead>Practices</TableHead>
-                    <TableHead>Trend</TableHead>
-                    <TableHead>Performance</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {farmerCarbonData.map((farmer) => (
-                    <TableRow key={farmer.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{farmer.name}</div>
-                          <div className="text-sm text-muted-foreground">{farmer.farm}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{farmer.hectares} ha</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Leaf className="h-4 w-4 text-green-500" />
-                          <span className="font-medium">{farmer.carbonSequestered}t</span>
-                        </div>
-                      </TableCell>
-                      {showRevenue && (
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-green-600" />
-                            <span className="font-medium text-green-600">₱{farmer.creditValue.toLocaleString()}</span>
-                          </div>
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {farmer.practices.slice(0, 2).map((practice, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
+        {!loading && data.length > 0 && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Farmer</TableHead>
+                <TableHead>Farm Size</TableHead>
+                <TableHead>CO₂ Sequestered</TableHead>
+                <TableHead>Practices</TableHead>
+                <TableHead>Trend</TableHead>
+                <TableHead>Performance</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {data.map((row) => {
+                const hectares = Number(row.Users?.Farms?.hectares || 0);
+                const co2 = Number(row.co2_sequestered || 0);
+
+                const performanceValue =
+                  hectares > 0 && avgSequestrationPerHa > 0
+                    ? Math.min(
+                        (co2 / hectares / avgSequestrationPerHa) * 100,
+                        100
+                      )
+                    : 0;
+
+                return (
+                  <TableRow key={row.id}>
+                    {/* Farmer */}
+                    <TableCell>
+                      <h3 className="font-medium">{row.Users?.name ?? "N/A"}</h3>
+                      <div className="text-gray-500">{row.Users?.Farms?.name ??  "No Farm"}</div>
+                    </TableCell>
+
+                    {/* Farm Size */}
+                    <TableCell>
+                        {row.Users?.Farms?.hectares ?? "N/A"} ha
+                    </TableCell>
+
+                    {/* CO₂ */}
+                    <TableCell>
+                      <div className="flex text-green-600 items-center">
+                        <Leaf className="h-4 w-4 text-green-500" />
+                        {row.co2_sequestered} kg CO₂
+                      </div>
+                    </TableCell>
+
+                    {/* Practices */}
+                    <TableCell className="w-[30%]">
+                      <div className="flex flex-wrap gap-1">
+                        {row.practices
+                          ?.split(",")                     // split the string
+                          .map((s: string) => s.trim())    // trim spaces
+                          .map((practice: string, idx: number) => (
+                            <div key={idx} className="text-xs pill font-semibold text-black-800 bg-gray-100 px-2 py-1 rounded-full">
                               {practice}
-                            </Badge>
+                            </div>
                           ))}
-                          {farmer.practices.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{farmer.practices.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-green-600">
-                          <TrendingUp className="h-3 w-3" />
-                          <span className="text-sm font-medium">{farmer.trend}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress 
-                            value={Math.min((farmer.carbonSequestered / farmer.hectares) / avgSequestrationPerHa * 100, 100)} 
-                            className="w-16" 
-                          />
-                          <span className="text-xs text-muted-foreground">
-                            {((farmer.carbonSequestered / farmer.hectares) / avgSequestrationPerHa * 100).toFixed(0)}%
-                          </span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                      </div>
 
-        <TabsContent value="summary" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Carbon Offset Performance</CardTitle>
-                <CardDescription>Season progress vs targets</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Monthly Target</span>
-                  <span className="font-medium">{carbonOffsetSummary.monthlyTarget}t CO₂</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Actual Sequestered</span>
-                  <span className="font-medium text-green-600">{carbonOffsetSummary.actualSequestered.toFixed(1)}t CO₂</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Projected Annual</span>
-                  <span className="font-medium">{carbonOffsetSummary.projectedAnnual.toFixed(0)}t CO₂</span>
-                </div>
-                <Progress 
-                  value={(carbonOffsetSummary.actualSequestered / carbonOffsetSummary.monthlyTarget) * 100} 
-                  className="mt-4" 
-                />
-              </CardContent>
-            </Card>
+                    </TableCell>
 
-            {showRevenue && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Revenue Conversion</CardTitle>
-                  <CardDescription>Credit monetization breakdown</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Market Price</span>
-                    <span className="font-medium">₱{carbonOffsetSummary.marketPrice}/t CO₂</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Current Credits</span>
-                    <span className="font-medium text-green-600">₱{totalCreditValue.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Projected Annual</span>
-                    <span className="font-medium text-green-600">₱{carbonOffsetSummary.potentialRevenue.toLocaleString()}</span>
-                  </div>
-                  <div className="text-center pt-4 border-t">
-                    <div className="text-2xl font-bold text-green-600">₱{(totalCreditValue / farmerCarbonData.length).toFixed(0)}</div>
-                    <div className="text-sm text-muted-foreground">Avg revenue per farmer</div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+                    {/* Trend */}
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-green-600">
+                        <TrendingUp className="h-3 w-3" />
+                        {row.trend}%
+                      </div>
+                    </TableCell>
+
+                    {/* Performance Progress */}
+                    <TableCell> 
+                      <div className="flex items-center gap-2">
+                        <Progress
+                          value={performanceValue}
+                          className="w-[100px] h-2 mt-1"
+                        /> {Math.round(performanceValue)}%
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
