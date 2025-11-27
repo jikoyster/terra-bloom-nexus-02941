@@ -88,7 +88,7 @@ const CarbonDashboard = () => {
   return (
     <Card className="p-4">
       <CardHeader>
-        <CardTitle>Carbon Credit Dashboard</CardTitle>
+        <CardTitle>Farm Dashboard</CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -165,7 +165,7 @@ const CarbonDashboard = () => {
                     <TableCell>
                       <div className="flex items-center gap-1 text-green-600">
                         <TrendingUp className="h-3 w-3" />
-                        {row.trend}%
+                        {row.trend}% 
                       </div>
                     </TableCell>
 

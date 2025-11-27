@@ -141,9 +141,17 @@ const SignupPage = () => {
               >
                 <option value="Farmer">Farmer</option>
                 <option value="Vendor">Vendor</option>
-                <option value="Admin">Admin</option>
+                <option value="Admin">Co-op</option>
               </select>
             </div>
+
+            <Button
+            type="submit"
+            className="w-full bg-green-600 text-white hover:bg-green-700"
+            disabled={loading}
+            >
+            {loading ? "Registering..." : "Register"}
+            </Button>
 
             {error && <p className="text-red-600 text-sm">{error}</p>}
           </form>

@@ -67,9 +67,11 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
+            {/*
             <h2 className="text-xl font-bold text-foreground">
               {user.user_metadata?.role || "User"} Dashboard
             </h2>
+            */}
             <div className="flex items-center gap-4 mt-1 flex-wrap">
               <span className="text-sm text-muted-foreground">
                 Logged in as{" "}
@@ -80,6 +82,7 @@ const Header: React.FC = () => {
               <Badge variant="outline">
                 Region: {user.user_metadata?.region || "N/A"}
               </Badge>
+              {/*
               <Button
                 variant="outline"
                 size="sm"
@@ -94,6 +97,7 @@ const Header: React.FC = () => {
               >
                 Switch to Farmer View
               </Button>
+              */}
             </div>
           </div>
 

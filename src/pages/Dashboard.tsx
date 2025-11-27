@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, X } from 'lucide-react';
+import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, X, Blocks } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { AuthController } from '../controllers/authController';
 
@@ -78,11 +78,14 @@ const Dashboard = () => {
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
           <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="overview"><TrendingUp className="h-4 w-4" /> Overview</TabsTrigger>
+            <TabsTrigger value="carbon"><Leaf className="h-4 w-4" /> Farm</TabsTrigger>
             <TabsTrigger value="farmers"><Users className="h-4 w-4" /> Farmers</TabsTrigger>
             <TabsTrigger value="vendors"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger>
+            <TabsTrigger value="coop"><Blocks className="h-4 w-4" /> Co-op</TabsTrigger>
+            
             <TabsTrigger value="erp"><AlertTriangle className="h-4 w-4" /> ERP</TabsTrigger>
-            <TabsTrigger value="carbon"><Leaf className="h-4 w-4" /> Carbon</TabsTrigger>
-            <TabsTrigger value="finance"><DollarSign className="h-4 w-4" /> Finance</TabsTrigger>
+            
+            
             <TabsTrigger value="market"><Store className="h-4 w-4" /> Market</TabsTrigger>
             <TabsTrigger value="admin"><Users className="h-4 w-4" /> Admin</TabsTrigger>
           </TabsList>
@@ -92,7 +95,7 @@ const Dashboard = () => {
           <TabsContent value="vendors" className="mt-6"><VendorMarketplace /></TabsContent>
           <TabsContent value="erp" className="mt-6"><ERPLayer /></TabsContent>
           <TabsContent value="carbon" className="mt-6"><CarbonDashboard /></TabsContent>
-          <TabsContent value="finance" className="mt-6"><FinanceDashboard /></TabsContent>
+          <TabsContent value="coop" className="mt-6"><FinanceDashboard /></TabsContent>
           <TabsContent value="market" className="mt-6"><TradingPlatform /></TabsContent>
           <TabsContent value="admin" className="mt-6"><AdminPanel /></TabsContent>
         </Tabs>
