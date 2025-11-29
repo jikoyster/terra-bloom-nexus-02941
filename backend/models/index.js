@@ -1,15 +1,11 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize("apdb", "postgres", "00000", {
-  host: "localhost",
-  dialect: "postgres",
-  port: 5432,
+const sequelize = new Sequelize('apdb', 'postgres', '00000', {
+  host: 'localhost',
+  dialect: 'postgres',
+  port: 5432
 });
 
-// Load models
-const FarmModel = require("./Farms")(sequelize, DataTypes);
+const Farm = require('./Farm')(sequelize, DataTypes);
 
-module.exports = {
-  sequelize,
-  Farm: FarmModel,
-};
+module.exports = { sequelize, Farm };

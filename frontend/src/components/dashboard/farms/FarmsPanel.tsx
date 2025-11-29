@@ -1,78 +1,55 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Leaf, TrendingUp, DollarSign, Users, BarChart3, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Leaf, TrendingUp, DollarSign } from 'lucide-react';
 
-const FarmDashboard = () => {
+interface Farm {
+  farm_id: number;
+  name: string;
+  region: string;
+  crops?: string;
+  hectares?: number;
+  carbon?: number;       // optional, if you store CO₂ data
+  creditValue?: number;   // optional, if you store revenue
+}
+
+const FarmsPanel = () => {
+  const [farms, setFarms] = useState<Farm[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showRevenue, setShowRevenue] = useState(false);
 
-  const farmerCarbonData = [
-    {
-      id: 1,
-      name: 'Maria Santos',
-      farm: 'Green Valley Farm',
-      hectares: 12.5,
-      carbonSequestered: 42.8, // tonnes CO2
-      creditValue: 1712, // PHP
-      practices: ['Cover Cropping', 'Composting', 'No-Till'],
-      trend: '+15%',
-      lastUpdated: '2024-07-13'
-    },
-    {
-      id: 2,
-      name: 'Juan dela Cruz',
-      farm: 'Sunrise Organics',
-      hectares: 8.3,
-      carbonSequestered: 28.6,
-      creditValue: 1144,
-      practices: ['Agroforestry', 'Biochar', 'Rotational Grazing'],
-      trend: '+22%',
-      lastUpdated: '2024-07-12'
-    },
-    {
-      id: 3,
-      name: 'Rosa Mendoza',
-      farm: 'EcoHarvest Co.',
-      hectares: 15.2,
-      carbonSequestered: 67.3,
-      creditValue: 2692,
-      practices: ['Permaculture', 'Water Conservation', 'Indigenous Seeds'],
-      trend: '+8%',
-      lastUpdated: '2024-07-13'
-    },
-    {
-      id: 4,
-      name: 'Pedro Reyes',
-      farm: 'Sustainable Fields',
-      hectares: 6.7,
-      carbonSequestered: 19.4,
-      creditValue: 776,
-      practices: ['Integrated Pest Mgmt', 'Mulching'],
-      trend: '+31%',
-      lastUpdated: '2024-07-11'
-    }
-  ];
+  useEffect(() => {
+    const fetchFarms = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/farms'); // your backend route
+        if (!res.ok) throw new Error('Failed to fetch farms');
+        const data: Farm[] = await res.json();
+        setFarms(data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching farms:', err);
+        setLoading(false);
+      }
+    };
 
-  const totalCarbonSequestered = farmerCarbonData.reduce((sum, farmer) => sum + farmer.carbonSequestered, 0);
-  const totalCreditValue = farmerCarbonData.reduce((sum, farmer) => sum + farmer.creditValue, 0);
-  const avgSequestrationPerHa = totalCarbonSequestered / farmerCarbonData.reduce((sum, farmer) => sum + farmer.hectares, 0);
+    fetchFarms();
+  }, []);
 
-  const carbonOffsetSummary = {
-    monthlyTarget: 200,
-    actualSequestered: totalCarbonSequestered,
-    projectedAnnual: totalCarbonSequestered * 8.5,
-    marketPrice: 40, // PHP per tonne CO2
-    potentialRevenue: totalCreditValue * 12
-  };
+  // Calculations for totals & averages
+  const totalCarbonSequestered = farms.reduce((sum, f) => sum + (f.carbon || 0), 0);
+  const totalCreditValue = farms.reduce((sum, f) => sum + (f.creditValue || 0), 0);
+  const avgSequestrationPerHa = farms.reduce((sum, f) => sum + (f.hectares || 0), 0)
+    ? totalCarbonSequestered / farms.reduce((sum, f) => sum + (f.hectares || 0), 0)
+    : 0;
+
+  if (loading) return <p>Loading farms...</p>;
+  if (!farms.length) return <p>No farms available.</p>;
 
   return (
     <div className="space-y-6">
-      {/* Toggle and Overview Cards */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">&nbsp;</h2>
         <Button
@@ -95,17 +72,17 @@ const FarmDashboard = () => {
             <div className="text-xs text-green-600">CO₂ this season</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Farms</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{farmerCarbonData.length}</div>
+            <div className="text-2xl font-bold">{farms.length}</div>
             <div className="text-xs text-muted-foreground">Participating in program</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Avg per Hectare</CardTitle>
@@ -115,7 +92,7 @@ const FarmDashboard = () => {
             <div className="text-xs text-muted-foreground">CO₂/ha sequestered</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
@@ -124,109 +101,49 @@ const FarmDashboard = () => {
           </CardHeader>
           <CardContent>
             {showRevenue ? (
-              <>
-                <div className="text-2xl font-bold text-green-600">₱{totalCreditValue.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">This season's credits</div>
-              </>
+              <div className="text-2xl font-bold text-green-600">₱{totalCreditValue.toLocaleString()}</div>
             ) : (
-              <>
-                <div className="text-2xl font-bold">{((totalCarbonSequestered / carbonOffsetSummary.monthlyTarget) * 100).toFixed(0)}%</div>
-                <Progress value={(totalCarbonSequestered / carbonOffsetSummary.monthlyTarget) * 100} className="mt-2" />
-              </>
+              <Progress value={Math.min((totalCarbonSequestered / 200) * 100, 100)} className="mt-2" />
             )}
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="farmers" className="w-full">
-        
-
-        <TabsContent value="farmers" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Registered Farms</CardTitle>
-              <CardDescription>All validated and officially recorded farms</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Farmer</TableHead>
-                    <TableHead>Farm Size</TableHead>
-                    <TableHead>CO₂ Sequestered</TableHead>
-                    {showRevenue && <TableHead>Credit Value</TableHead>}
-                    <TableHead>Practices</TableHead>
-                    <TableHead>Trend</TableHead>
-                    <TableHead>Performance</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {farmerCarbonData.map((farmer) => (
-                    <TableRow key={farmer.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{farmer.name}</div>
-                          <div className="text-sm text-muted-foreground">{farmer.farm}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{farmer.hectares} ha</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Leaf className="h-4 w-4 text-green-500" />
-                          <span className="font-medium">{farmer.carbonSequestered}t</span>
-                        </div>
-                      </TableCell>
-                      {showRevenue && (
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-green-600" />
-                            <span className="font-medium text-green-600">₱{farmer.creditValue.toLocaleString()}</span>
-                          </div>
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {farmer.practices.slice(0, 2).map((practice, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
-                              {practice}
-                            </Badge>
-                          ))}
-                          {farmer.practices.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{farmer.practices.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-green-600">
-                          <TrendingUp className="h-3 w-3" />
-                          <span className="text-sm font-medium">{farmer.trend}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress 
-                            value={Math.min((farmer.carbonSequestered / farmer.hectares) / avgSequestrationPerHa * 100, 100)} 
-                            className="w-16" 
-                          />
-                          <span className="text-xs text-muted-foreground">
-                            {((farmer.carbonSequestered / farmer.hectares) / avgSequestrationPerHa * 100).toFixed(0)}%
-                          </span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        
-      </Tabs>
+      {/* Farms Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Registered Farms</CardTitle>
+          <CardDescription>All validated and officially recorded farms</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Farm Name</TableHead>
+                <TableHead>Region</TableHead>
+                <TableHead>Crops</TableHead>
+                <TableHead>Size (ha)</TableHead>
+                <TableHead>Created At</TableHead>
+                {showRevenue && <TableHead>Credit Value</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {farms.map((farm) => (
+                <TableRow key={farm.farm_id}>
+                  <TableCell className='text-[1.1em] font-medium text-green-700'>{farm.name}</TableCell>
+                  <TableCell>{farm.region}</TableCell>
+                  <TableCell>{farm.crops || '-'}</TableCell>
+                  <TableCell className='w-[10%]'>{farm.hectares || '-'} hectares</TableCell>
+                  <TableCell>{new Date(farm.created_at).toLocaleDateString()}</TableCell>
+                  {showRevenue && <TableCell>₱{(farm.creditValue || 0).toLocaleString()}</TableCell>}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default FarmDashboard;
+export default FarmsPanel;
