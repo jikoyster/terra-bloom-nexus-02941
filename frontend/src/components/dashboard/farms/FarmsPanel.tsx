@@ -123,6 +123,7 @@ const FarmsPanel = () => {
                 <TableHead>Region</TableHead>
                 <TableHead>Crops</TableHead>
                 <TableHead>Size (ha)</TableHead>
+                <TableHead>CO2 Sequestered</TableHead>
                 <TableHead>Created At</TableHead>
                 {showRevenue && <TableHead>Credit Value</TableHead>}
               </TableRow>
@@ -134,6 +135,7 @@ const FarmsPanel = () => {
                   <TableCell>{farm.region}</TableCell>
                   <TableCell>{farm.crops || '-'}</TableCell>
                   <TableCell className='w-[10%]'>{farm.hectares || '-'} hectares</TableCell>
+                  <TableCell className='w-[10%]'>{farm.carbon_sequestered || '-'} tCO2</TableCell>
                   <TableCell>{new Date(farm.created_at).toLocaleDateString()}</TableCell>
                   {showRevenue && <TableCell>₱{(farm.creditValue || 0).toLocaleString()}</TableCell>}
                 </TableRow>

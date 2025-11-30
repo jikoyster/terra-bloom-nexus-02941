@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       address: DataTypes.TEXT,
       crops: DataTypes.TEXT,
       hectares: DataTypes.BIGINT,
+      carbon_sequestered: DataTypes.BIGINT,
       created_at: DataTypes.DATE,
       updated_at: DataTypes.DATE
     },
