@@ -1,3 +1,3 @@
 First  
-on both backend/ and frontend/
+on both backend/ and frontend/  
 npm install
