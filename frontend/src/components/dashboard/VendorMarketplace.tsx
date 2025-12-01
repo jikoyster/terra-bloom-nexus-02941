@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import VendorStats from './vendor/VendorStats';
 import VendorSearch from './vendor/VendorSearch';
-import VendorTable from './vendor/VendorTable';
+import VendorTable from './vendor/VendorsPanel';
 import PendingVendorApplications from './vendor/PendingVendorApplications';
 
 const VendorMarketplace = () => {

@@ -12,12 +12,21 @@ const sequelize = new Sequelize("apdb", "postgres", "00000", {
 // Import models
 const Farm = require("./Farm")(sequelize, DataTypes);
 const Farmer = require("./Farmer")(sequelize, DataTypes);
+
+const VendorCategory = require("./VendorCategory")(sequelize, DataTypes);
+const Vendor = require("./Vendor")(sequelize, DataTypes);
+
 const Authentication = require("./Authentication")(sequelize, DataTypes);
+
+// Define associations
+Vendor.associate({ VendorCategory });
 
 // Export sequelize and models
 module.exports = {
   sequelize,
   Farm,
   Farmer,
+  Vendor,
+  VendorCategory,
   Authentication,
 };

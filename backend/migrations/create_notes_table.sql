@@ -71,19 +71,36 @@ ALTER TABLE IF EXISTS public.farmers
 -- Table: public.vendors
 CREATE TABLE IF NOT EXISTS public.vendors
 (
-    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    products text COLLATE pg_catalog."default",
-    stocks integer DEFAULT 0,
-    status character varying(255) COLLATE pg_catalog."default",
-    address character varying(255) COLLATE pg_catalog."default",
-    email character varying(255) COLLATE pg_catalog."default",
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone,
-    vendor_id integer NOT NULL DEFAULT nextval('vendor_vendor_id_seq'::regclass),
-    CONSTRAINT vendors_status_check CHECK (status::text = ANY (ARRAY['Verified'::text, 'Unverified'::text]))
-)
+    vendor_id   SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
 
-TABLESPACE pg_default;
+    -- NEW: Proper FK instead of plain text
+    category_id INT REFERENCES public.vendor_categories(cat_id) ON DELETE SET NULL,
 
-ALTER TABLE IF EXISTS public.farmers
-    OWNER to postgres;
+    address     VARCHAR(255),
+    phone       VARCHAR(255) NOT NULL,
+    email       VARCHAR(255),
+
+    status      VARCHAR(255) DEFAULT 'Unverified',
+
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW(),
+
+    CONSTRAINT vendors_status_check 
+        CHECK (status IN ('Verified', 'Unverified'))
+);
+
+ALTER TABLE IF EXISTS public.vendors
+    OWNER TO postgres;
+
+-- Table: public.vendor_categories
+CREATE TABLE IF NOT EXISTS public.vendor_categories
+(
+    cat_id      SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE IF EXISTS public.vendor_categories
+    OWNER TO postgres;
