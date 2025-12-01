@@ -11,9 +11,9 @@ exports.getAllFarmers = async (req, res) => {
 };
 
 exports.createFarmer = async (req, res) => {
-  const { name, products, stock_level, status, location, email } = req.body;
+  const { name, products, status, address, email } = req.body;
   try {
-    const newFarmer = await Farmer.create({ name, products, stock_level, status, location, email });
+    const newFarmer = await Farmer.create({ name, products, status, address, email });
     res.json(newFarmer);
   } catch (err) {
     console.error(err);

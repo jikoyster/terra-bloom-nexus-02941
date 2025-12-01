@@ -51,16 +51,36 @@ TABLESPACE pg_default;
 -- Table: public.farmers
 CREATE TABLE IF NOT EXISTS public.farmers
 (
+    farmer_id   SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    products    TEXT,
+    status      VARCHAR(255) DEFAULT 'Unverified',
+    address     VARCHAR(255),
+    email       VARCHAR(255),
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW(),
+
+    CONSTRAINT farmers_status_check 
+        CHECK (status IN ('Verified', 'Unverified'))
+);
+
+ALTER TABLE IF EXISTS public.farmers
+    OWNER TO postgres;
+
+
+-- Table: public.vendors
+CREATE TABLE IF NOT EXISTS public.vendors
+(
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     products text COLLATE pg_catalog."default",
-    stock_level integer DEFAULT 0,
+    stocks integer DEFAULT 0,
     status character varying(255) COLLATE pg_catalog."default",
-    location character varying(255) COLLATE pg_catalog."default",
+    address character varying(255) COLLATE pg_catalog."default",
     email character varying(255) COLLATE pg_catalog."default",
     created_at timestamp with time zone,
     updated_at timestamp with time zone,
-    farmer_id integer NOT NULL DEFAULT nextval('farmers_farmer_id_seq'::regclass),
-    CONSTRAINT farmers_status_check CHECK (status::text = ANY (ARRAY['Verified'::text, 'Unverified'::text]))
+    vendor_id integer NOT NULL DEFAULT nextval('vendor_vendor_id_seq'::regclass),
+    CONSTRAINT vendors_status_check CHECK (status::text = ANY (ARRAY['Verified'::text, 'Unverified'::text]))
 )
 
 TABLESPACE pg_default;

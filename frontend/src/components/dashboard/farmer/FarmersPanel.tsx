@@ -22,9 +22,8 @@ interface Farmer {
   id: number;
   name: string;
   products: string;
-  stock_level: number;
   status: string;
-  location: string;
+  address: string;
   email: string;
   created_at: string;
   updated_at: string;
@@ -54,7 +53,6 @@ const FarmersPanel = () => {
   }, []);
 
   // Example calculations (you can replace these with real formulas later)
-  const totalStock = farmers.reduce((sum, f) => sum + (f.stock_level || 0), 0);
   const activeFarmers = farmers.filter((f) => f.status === "Verified").length;
 
   const progressValue =
@@ -70,18 +68,11 @@ const FarmersPanel = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">&nbsp;</h2>
 
-        <Button
-          variant="outline"
-          onClick={() => setShowRevenue(!showRevenue)}
-          className="flex items-center gap-2"
-        >
-          {showRevenue ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          {showRevenue ? "Hide Revenue" : "Show Revenue"}
-        </Button>
+        
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Farmers</CardTitle>
@@ -102,33 +93,8 @@ const FarmersPanel = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Stock</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalStock}</div>
-            <div className="text-xs text-muted-foreground">Units</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              {showRevenue ? "Revenue (Demo)" : "Verification Progress"}
-            </CardTitle>
-          </CardHeader>
-
-          <CardContent>
-            {showRevenue ? (
-              <div className="text-2xl font-bold text-green-600">
-                ₱{(activeFarmers * 250).toLocaleString()}
-              </div>
-            ) : (
-              <Progress value={progressValue} className="mt-2" />
-            )}
-          </CardContent>
-        </Card>
+       
+       
       </div>
 
       {/* Farmers Table */}
@@ -144,13 +110,10 @@ const FarmersPanel = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Products</TableHead>
-                <TableHead>Stock</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead>Address</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Created At</TableHead>
-
-                {showRevenue && <TableHead>Revenue (Demo)</TableHead>}
               </TableRow>
             </TableHeader>
 
@@ -162,19 +125,15 @@ const FarmersPanel = () => {
                   </TableCell>
 
                   <TableCell>{farmer.products || "-"}</TableCell>
-                  <TableCell>{farmer.stock_level}</TableCell>
+                  
                   <TableCell>{farmer.status}</TableCell>
-                  <TableCell>{farmer.location || "-"}</TableCell>
+                  <TableCell>{farmer.address || "-"}</TableCell>
                   <TableCell>{farmer.email || "-"}</TableCell>
                   <TableCell>
                     {new Date(farmer.created_at).toLocaleDateString()}
                   </TableCell>
 
-                  {showRevenue && (
-                    <TableCell>
-                      ₱{(farmer.stock_level * 100).toLocaleString()}
-                    </TableCell>
-                  )}
+                  
                 </TableRow>
               ))}
             </TableBody>
