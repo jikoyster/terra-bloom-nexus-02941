@@ -139,7 +139,11 @@ const FarmsPanel = () => {
                   <TableCell>{farm.yield + ' kg/ha'}</TableCell>
                   <TableCell className='w-[10%]'>{farm.hectares || '-'} hectares</TableCell>
                   <TableCell className='w-[10%]'>{farm.carbon_sequestered || '-'} tCO2</TableCell>
-                  <TableCell>{new Date(farm.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(farm.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}</TableCell>
                   {showRevenue && <TableCell>₱{(farm.creditValue || 0).toLocaleString()}</TableCell>}
                 </TableRow>
               ))}
