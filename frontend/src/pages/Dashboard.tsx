@@ -1,23 +1,18 @@
-
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, Home } from 'lucide-react';
+import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, LogOut } from 'lucide-react';
 import KPISummary from '@/components/dashboard/KPISummary';
-import FarmersPanel from '@/components/dashboard/FarmersPanel';
+import FarmersPanel from '@/components/dashboard/farmer/FarmersPanel';
 import VendorMarketplace from '@/components/dashboard/VendorMarketplace';
 import ERPLayer from '@/components/dashboard/ERPLayer';
-
 import FarmsPanel from '@/components/dashboard/farms/FarmsPanel';
-
-import CarbonDashboard from '@/components/dashboard/CarbonDashboard';
 import FinanceDashboard from '@/components/dashboard/FinanceDashboard';
 import AdminPanel from '@/components/dashboard/AdminPanel';
 import TradingPlatform from '@/components/dashboard/TradingPlatform';
-import { set } from 'date-fns';
 
 const Dashboard = () => {
   const [activeView, setActiveView] = useState('farmsPanel');
@@ -27,11 +22,17 @@ const Dashboard = () => {
     { id: 3, type: 'vendor', message: 'New organic fertilizer vendor registered', priority: 'low' }
   ]);
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card shadow-sm">
-        {/* Top Bar - Logo and Home Link */}
         <div className="border-b border-border bg-background">
           <div className="container mx-auto px-6 py-3">
             <Link to="/" className="flex items-center justify-center gap-3 hover:opacity-80 transition-opacity">
@@ -42,8 +43,7 @@ const Dashboard = () => {
             </Link>
           </div>
         </div>
-        
-        {/* Main Header */}
+
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -51,24 +51,11 @@ const Dashboard = () => {
               <div className="flex items-center gap-4 mt-1">
                 <span className="text-sm text-muted-foreground">Mindanao Valley Co-operative</span>
                 <Badge variant="outline">Season: Wet 2024</Badge>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => window.location.href = '/vendor-dashboard'}
-                  className="ml-4"
-                >
-                  Switch to Vendor View
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => window.location.href = '/farmer-dashboard'}
-                >
-                  Switch to Farmer View
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => window.location.href = '/vendor-dashboard'} className="ml-4">Switch to Vendor View</Button>
+                <Button variant="outline" size="sm" onClick={() => window.location.href = '/farmer-dashboard'}>Switch to Farmer View</Button>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Button variant="outline" size="sm" className="relative">
@@ -84,6 +71,9 @@ const Dashboard = () => {
                 <p className="text-sm font-medium">Manager: Ana Santos</p>
                 <p className="text-xs text-muted-foreground">Region: Bukidnon</p>
               </div>
+              <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center gap-1">
+                <LogOut className="h-4 w-4" /> Logout
+              </Button>
             </div>
           </div>
         </div>
@@ -93,46 +83,19 @@ const Dashboard = () => {
       <div className="container mx-auto px-6 py-4">
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
           <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="farmsPanel" className="flex items-center gap-2">
-              <Leaf className="h-4 w-4" />
-              Farms
-            </TabsTrigger>
-            <TabsTrigger value="farmers" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Farmers
-            </TabsTrigger>
-            <TabsTrigger value="vendors" className="flex items-center gap-2">
-              <ShoppingBag className="h-4 w-4" />
-              Vendors
-            </TabsTrigger>
-            <TabsTrigger value="erp" className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              ERP
-            </TabsTrigger>
-            
-            <TabsTrigger value="finance" className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Finance
-            </TabsTrigger>
-            <TabsTrigger value="market" className="flex items-center gap-2">
-              <Store className="h-4 w-4" />
-              Market
-            </TabsTrigger>
-            <TabsTrigger value="admin" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Admin
-            </TabsTrigger>
+            <TabsTrigger value="overview" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Overview</TabsTrigger>
+            <TabsTrigger value="farmsPanel" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
+            <TabsTrigger value="farmers" className="flex items-center gap-2"><Users className="h-4 w-4" /> Farmers</TabsTrigger>
+            <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger>
+            <TabsTrigger value="erp" className="flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> ERP</TabsTrigger>
+            <TabsTrigger value="finance" className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Finance</TabsTrigger>
+            <TabsTrigger value="market" className="flex items-center gap-2"><Store className="h-4 w-4" /> Market</TabsTrigger>
+            <TabsTrigger value="admin" className="flex items-center gap-2"><Users className="h-4 w-4" /> Admin</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
             <div className="space-y-6">
               <KPISummary />
-              
-              {/* Recent Activity */}
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
@@ -143,15 +106,10 @@ const Dashboard = () => {
                     {notifications.map((notification) => (
                       <div key={notification.id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex items-center gap-3">
-                          <div className={`w-2 h-2 rounded-full ${
-                            notification.priority === 'high' ? 'bg-destructive' :
-                            notification.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'
-                          }`} />
+                          <div className={`w-2 h-2 rounded-full ${notification.priority === 'high' ? 'bg-destructive' : notification.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'}`} />
                           <span className="text-sm">{notification.message}</span>
                         </div>
-                        <Badge variant={notification.priority === 'high' ? 'destructive' : 'secondary'}>
-                          {notification.priority}
-                        </Badge>
+                        <Badge variant={notification.priority === 'high' ? 'destructive' : 'secondary'}>{notification.priority}</Badge>
                       </div>
                     ))}
                   </div>
@@ -160,33 +118,13 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="farmers" className="mt-6">
-            <FarmersPanel />
-          </TabsContent>
-
-          <TabsContent value="vendors" className="mt-6">
-            <VendorMarketplace />
-          </TabsContent>
-
-          <TabsContent value="erp" className="mt-6">
-            <ERPLayer />
-          </TabsContent>
-
-          <TabsContent value="farmsPanel" className="mt-6">
-            <FarmsPanel />
-          </TabsContent>
-
-          <TabsContent value="finance" className="mt-6">
-            <FinanceDashboard />
-          </TabsContent>
-
-          <TabsContent value="market" className="mt-6">
-            <TradingPlatform />
-          </TabsContent>
-
-          <TabsContent value="admin" className="mt-6">
-            <AdminPanel />
-          </TabsContent>
+          <TabsContent value="farmsPanel" className="mt-6"><FarmsPanel /></TabsContent>
+          <TabsContent value="farmers" className="mt-6"><FarmersPanel /></TabsContent>
+          <TabsContent value="vendors" className="mt-6"><VendorMarketplace /></TabsContent>
+          <TabsContent value="erp" className="mt-6"><ERPLayer /></TabsContent>
+          <TabsContent value="finance" className="mt-6"><FinanceDashboard /></TabsContent>
+          <TabsContent value="market" className="mt-6"><TradingPlatform /></TabsContent>
+          <TabsContent value="admin" className="mt-6"><AdminPanel /></TabsContent>
         </Tabs>
       </div>
     </div>

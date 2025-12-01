@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       farm_id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
       name: DataTypes.TEXT,
       region: DataTypes.TEXT,
+      yield: DataTypes.BIGINT,
       address: DataTypes.TEXT,
       crops: DataTypes.TEXT,
       hectares: DataTypes.BIGINT,

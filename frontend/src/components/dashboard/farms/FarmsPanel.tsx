@@ -10,6 +10,7 @@ interface Farm {
   farm_id: number;
   name: string;
   region: string;
+  yield?: number;
   crops?: string;
   hectares?: number;
   carbon?: number;       // optional, if you store CO₂ data
@@ -122,6 +123,7 @@ const FarmsPanel = () => {
                 <TableHead>Farm Name</TableHead>
                 <TableHead>Region</TableHead>
                 <TableHead>Crops</TableHead>
+                <TableHead>Yield</TableHead>
                 <TableHead>Size (ha)</TableHead>
                 <TableHead>CO2 Sequestered</TableHead>
                 <TableHead>Created At</TableHead>
@@ -134,6 +136,7 @@ const FarmsPanel = () => {
                   <TableCell className='text-[1.1em] font-medium text-green-700'>{farm.name}</TableCell>
                   <TableCell>{farm.region}</TableCell>
                   <TableCell>{farm.crops || '-'}</TableCell>
+                  <TableCell>{farm.yield + ' kg/ha'}</TableCell>
                   <TableCell className='w-[10%]'>{farm.hectares || '-'} hectares</TableCell>
                   <TableCell className='w-[10%]'>{farm.carbon_sequestered || '-'} tCO2</TableCell>
                   <TableCell>{new Date(farm.created_at).toLocaleDateString()}</TableCell>
