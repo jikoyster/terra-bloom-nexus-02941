@@ -9,6 +9,7 @@ const farmerController = require("./controllers/farmerController");
 
 const farmerRoutes = require("./routes/farmers");
 const vendorRoutes = require("./routes/vendors");
+const cooperativeRoutes = require("./routes/cooperatives");
 
 const app = express();
 app.use(cors());
@@ -22,6 +23,8 @@ app.post("/api/farms", farmController.createFarm);
 app.use("/api/farmers", farmerRoutes);
 // Vendor routes
 app.use("/api/vendors", vendorRoutes);
+// Cooperative routes
+app.use("/api/cooperatives", cooperativeRoutes);
 // Authentication routes
 app.use("/api/auth", authRoutes);
 

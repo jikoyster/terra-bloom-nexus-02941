@@ -104,3 +104,53 @@ CREATE TABLE IF NOT EXISTS public.vendor_categories
 
 ALTER TABLE IF EXISTS public.vendor_categories
     OWNER TO postgres;
+
+-- Create table: public.cooperatives
+CREATE TABLE IF NOT EXISTS public.cooperatives
+(
+    coop_id            SERIAL PRIMARY KEY,
+    name               VARCHAR(255) NOT NULL,
+    registration_no    VARCHAR(100) UNIQUE,
+    status             VARCHAR(50) DEFAULT 'Active',     -- Active | Inactive | Suspended
+    address            VARCHAR(255),
+    region             VARCHAR(100),
+    contact_person     VARCHAR(150),
+    phone              VARCHAR(50),
+    email              VARCHAR(255),
+    members_count      INTEGER DEFAULT 0,
+    established_at     DATE,
+    created_at         TIMESTAMPTZ DEFAULT NOW(),
+    updated_at         TIMESTAMPTZ DEFAULT NOW(),
+
+    CONSTRAINT cooperatives_status_check CHECK (status IN ('Active','Inactive','Suspended'))
+);
+
+ALTER TABLE IF EXISTS public.cooperatives
+    OWNER TO postgres;
+
+-- Table: public.soil_assessment
+CREATE TABLE IF NOT EXISTS public.soil_assessment
+(
+    assessment_id SERIAL PRIMARY KEY,
+
+    farm_id INTEGER NOT NULL,
+    assessment_date DATE NOT NULL DEFAULT CURRENT_DATE,
+
+    -- Soil Condition Values
+    ph_level NUMERIC(4,2),                 -- Example: 6.50
+    nitrogen NUMERIC(10,2),                -- N (kg/ha)
+    phosphorus NUMERIC(10,2),              -- P (kg/ha)
+    potassium NUMERIC(10,2),               -- K (kg/ha)
+
+    organic_matter NUMERIC(5,2),           -- percent %
+    moisture_level NUMERIC(5,2),           -- percent %
+    soil_texture VARCHAR(255),             -- e.g., Clay, Loam, Sandy Loam, etc.
+
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+    CONSTRAINT soil_assessment_farm_fk 
+        FOREIGN KEY (farm_id) REFERENCES public."Farms"(farm_id)
+        ON DELETE CASCADE
+);

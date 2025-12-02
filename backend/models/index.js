@@ -16,6 +16,8 @@ const Farmer = require("./Farmer")(sequelize, DataTypes);
 const VendorCategory = require("./VendorCategory")(sequelize, DataTypes);
 const Vendor = require("./Vendor")(sequelize, DataTypes);
 
+const Cooperative = require("./Cooperative")(sequelize, DataTypes);
+
 const Authentication = require("./Authentication")(sequelize, DataTypes);
 
 // Define associations
@@ -28,5 +30,6 @@ module.exports = {
   Farmer,
   Vendor,
   VendorCategory,
+  Cooperative,
   Authentication,
 };
