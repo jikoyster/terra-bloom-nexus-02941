@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, LogOut } from 'lucide-react';
+import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, LogOut, Group } from 'lucide-react';
 import KPISummary from '@/components/dashboard/KPISummary';
 import FarmersPanel from '@/components/dashboard/farmer/FarmersPanel';
 import VendorMarketplace from '@/components/dashboard/VendorMarketplace';
@@ -89,7 +89,7 @@ const Dashboard = () => {
             <TabsTrigger value="farmsPanel" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
             <TabsTrigger value="farmers" className="flex items-center gap-2"><Users className="h-4 w-4" /> Farmers</TabsTrigger>
             <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger>
-            <TabsTrigger value="cooperative" className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Co-op</TabsTrigger>
+            <TabsTrigger value="cooperative" className="flex items-center gap-2"><Group className="h-4 w-4" /> Co-op</TabsTrigger>
 
             <TabsTrigger value="erp" className="flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> ERP</TabsTrigger>            
             <TabsTrigger value="market" className="flex items-center gap-2"><Store className="h-4 w-4" /> Market</TabsTrigger>

@@ -5,16 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Eye, EyeOff, Leaf, TrendingUp, DollarSign } from 'lucide-react';
+import { Link } from "react-router-dom";
 
 interface Farm {
+  created_at: string | number | Date;
   farm_id: number;
   name: string;
   region: string;
   yield?: number;
   crops?: string;
   hectares?: number;
-  carbon?: number;       // optional, if you store CO₂ data
-  creditValue?: number;   // optional, if you store revenue
+  carbon_sequestered: number;       // optional, if you store CO₂ data
 }
 
 const FarmsPanel = () => {
@@ -40,8 +41,7 @@ const FarmsPanel = () => {
   }, []);
 
   // Calculations for totals & averages
-  const totalCarbonSequestered = farms.reduce((sum, f) => sum + (f.carbon || 0), 0);
-  const totalCreditValue = farms.reduce((sum, f) => sum + (f.creditValue || 0), 0);
+  const totalCarbonSequestered = farms.reduce((sum, f) => sum + Number(f.carbon_sequestered || 0), 0);
   const avgSequestrationPerHa = farms.reduce((sum, f) => sum + (f.hectares || 0), 0)
     ? totalCarbonSequestered / farms.reduce((sum, f) => sum + (f.hectares || 0), 0)
     : 0;
@@ -51,25 +51,14 @@ const FarmsPanel = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">&nbsp;</h2>
-        <Button
-          variant="outline"
-          onClick={() => setShowRevenue(!showRevenue)}
-          className="flex items-center gap-2"
-        >
-          {showRevenue ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          {showRevenue ? 'Hide Revenue' : 'Show Revenue'}
-        </Button>
-      </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Carbon Sequestered</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCarbonSequestered.toFixed(1)}t</div>
+            <div className="text-2xl font-bold">{totalCarbonSequestered.toFixed(2)} t</div>
             <div className="text-xs text-green-600">CO₂ this season</div>
           </CardContent>
         </Card>
@@ -93,21 +82,6 @@ const FarmsPanel = () => {
             <div className="text-xs text-muted-foreground">CO₂/ha sequestered</div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              {showRevenue ? 'Credit Value' : 'Monthly Progress'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {showRevenue ? (
-              <div className="text-2xl font-bold text-green-600">₱{totalCreditValue.toLocaleString()}</div>
-            ) : (
-              <Progress value={Math.min((totalCarbonSequestered / 200) * 100, 100)} className="mt-2" />
-            )}
-          </CardContent>
-        </Card>
       </div>
 
       {/* Farms Table */}
@@ -126,25 +100,28 @@ const FarmsPanel = () => {
                 <TableHead>Yield</TableHead>
                 <TableHead>Size (ha)</TableHead>
                 <TableHead>CO2 Sequestered</TableHead>
-                <TableHead>Created At</TableHead>
-                {showRevenue && <TableHead>Credit Value</TableHead>}
+                <TableHead>{/*view deatils*/}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {farms.map((farm) => (
                 <TableRow key={farm.farm_id}>
-                  <TableCell className='text-[1.1em] font-medium text-green-700'>{farm.name}</TableCell>
+                  <TableCell className='text-[1.1em] font-medium text-green-700'>
+  <Link to={`/farms/${farm.farm_id}`}>{farm.name}</Link>
+</TableCell>
                   <TableCell>{farm.region}</TableCell>
                   <TableCell>{farm.crops || '-'}</TableCell>
                   <TableCell>{farm.yield + ' kg/ha'}</TableCell>
                   <TableCell className='w-[10%]'>{farm.hectares || '-'} hectares</TableCell>
                   <TableCell className='w-[10%]'>{farm.carbon_sequestered || '-'} tCO2</TableCell>
-                  <TableCell>{new Date(farm.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}</TableCell>
-                  {showRevenue && <TableCell>₱{(farm.creditValue || 0).toLocaleString()}</TableCell>}
+                  <TableCell>
+                    <Link
+                      to={`/farms/${farm.farm_id}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Details
+                    </Link>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

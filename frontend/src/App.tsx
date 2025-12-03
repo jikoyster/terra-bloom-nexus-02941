@@ -6,8 +6,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import VendorDashboard from "./components/dashboard/VendorDashboard";
-import FarmerDashboard from "./components/dashboard/FarmerDashboard";
+
+import FarmsPanel from "@/components/dashboard/farms/FarmsPanel";
+import FarmDetails from "@/components/dashboard/farms/FarmDetails";
+
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
@@ -35,14 +37,10 @@ const App = () => (
             path="/dashboard"
             element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
           />
-          <Route
-            path="/vendor-dashboard"
-            element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>}
-          />
-          <Route
-            path="/farmer-dashboard"
-            element={<ProtectedRoute><FarmerDashboard /></ProtectedRoute>}
-          />
+
+          <Route path="/farms" element={<ProtectedRoute><FarmsPanel /></ProtectedRoute>} />
+          <Route path="/farms/:id" element={<ProtectedRoute><FarmDetails /></ProtectedRoute>} />
+          
 
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
