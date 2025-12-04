@@ -1,4 +1,4 @@
-const { SoilAssessment } = require("../models");
+const { Farm, SoilAssessment } = require("../models");
 
 exports.getByFarmId = async (req, res) => {
   const { farm_id } = req.params;

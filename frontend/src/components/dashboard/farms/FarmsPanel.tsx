@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Eye, EyeOff, Leaf, TrendingUp, DollarSign } from 'lucide-react';
-import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import FarmDetails from './FarmDetails'; // <-- make sure this path is correct
+import { Link,  SquareArrowOutUpRight } from 'lucide-react';
 
 interface Farm {
   created_at: string | number | Date;
@@ -15,24 +13,31 @@ interface Farm {
   yield?: number;
   crops?: string;
   hectares?: number;
-  carbon_sequestered: number;       // optional, if you store CO₂ data
+  carbon_sequestered: number;
 }
 
 const FarmsPanel = () => {
   const [farms, setFarms] = useState<Farm[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showRevenue, setShowRevenue] = useState(false);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedFarmId, setSelectedFarmId] = useState<number | null>(null);
+
+  const openFarmModal = (farmId: number) => {
+    setSelectedFarmId(farmId);
+    setOpenModal(true);
+  };
 
   useEffect(() => {
     const fetchFarms = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/farms'); // your backend route
+        const res = await fetch('http://localhost:5000/api/farms');
         if (!res.ok) throw new Error('Failed to fetch farms');
         const data: Farm[] = await res.json();
         setFarms(data);
-        setLoading(false);
       } catch (err) {
         console.error('Error fetching farms:', err);
+      } finally {
         setLoading(false);
       }
     };
@@ -40,49 +45,26 @@ const FarmsPanel = () => {
     fetchFarms();
   }, []);
 
-  // Calculations for totals & averages
-  const totalCarbonSequestered = farms.reduce((sum, f) => sum + Number(f.carbon_sequestered || 0), 0);
-  const avgSequestrationPerHa = farms.reduce((sum, f) => sum + (f.hectares || 0), 0)
-    ? totalCarbonSequestered / farms.reduce((sum, f) => sum + (f.hectares || 0), 0)
-    : 0;
-
   if (loading) return <p>Loading farms...</p>;
   if (!farms.length) return <p>No farms available.</p>;
 
   return (
     <div className="space-y-6">
-      
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Carbon Sequestered</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalCarbonSequestered.toFixed(2)} t</div>
-            <div className="text-xs text-green-600">CO₂ this season</div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Farms</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{farms.length}</div>
-            <div className="text-xs text-muted-foreground">Participating in program</div>
-          </CardContent>
-        </Card>
+      {/* FARM DETAILS MODAL */}
+      <Dialog open={openModal} onOpenChange={setOpenModal}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Farm Details</DialogTitle>
+          </DialogHeader>
+          {selectedFarmId && (
+            <FarmDetails farmId={selectedFarmId} />
+          )}
+        </DialogContent>
+      </Dialog>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Avg per Hectare</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgSequestrationPerHa.toFixed(1)}t</div>
-            <div className="text-xs text-muted-foreground">CO₂/ha sequestered</div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Summary cards ... keep your existing content */}
+
 
       {/* Farms Table */}
       <Card>
@@ -90,6 +72,7 @@ const FarmsPanel = () => {
           <CardTitle>Registered Farms</CardTitle>
           <CardDescription>All validated and officially recorded farms</CardDescription>
         </CardHeader>
+
         <CardContent>
           <Table>
             <TableHeader>
@@ -99,32 +82,39 @@ const FarmsPanel = () => {
                 <TableHead>Crops</TableHead>
                 <TableHead>Yield</TableHead>
                 <TableHead>Size (ha)</TableHead>
-                <TableHead>CO2 Sequestered</TableHead>
-                <TableHead>{/*view deatils*/}</TableHead>
+                <TableHead>CO₂ Sequestered</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {farms.map((farm) => (
                 <TableRow key={farm.farm_id}>
-                  <TableCell className='text-[1.1em] font-medium text-green-700'>
-  <Link to={`/farms/${farm.farm_id}`}>{farm.name}</Link>
-</TableCell>
+                  <TableCell
+                    className="text-[1.1em] font-medium text-green-700 cursor-pointer hover:underline"
+                    onClick={() => openFarmModal(farm.farm_id)}
+                  >
+                    {farm.name} <SquareArrowOutUpRight  className="inline-block ml-1 h-4 w-4" />  
+                  </TableCell>
+
                   <TableCell>{farm.region}</TableCell>
                   <TableCell>{farm.crops || '-'}</TableCell>
                   <TableCell>{farm.yield + ' kg/ha'}</TableCell>
-                  <TableCell className='w-[10%]'>{farm.hectares || '-'} hectares</TableCell>
-                  <TableCell className='w-[10%]'>{farm.carbon_sequestered || '-'} tCO2</TableCell>
+                  <TableCell>{farm.hectares || '-'} ha</TableCell>
+                  <TableCell>{farm.carbon_sequestered || '-'} tCO2</TableCell>
+
                   <TableCell>
-                    <Link
-                      to={`/farms/${farm.farm_id}`}
+                    <button
                       className="text-blue-600 hover:underline"
+                      onClick={() => openFarmModal(farm.farm_id)}
                     >
                       View Details
-                    </Link>
+                    </button>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
+
           </Table>
         </CardContent>
       </Card>
