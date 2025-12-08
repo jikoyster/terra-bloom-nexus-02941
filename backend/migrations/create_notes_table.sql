@@ -154,3 +154,64 @@ CREATE TABLE IF NOT EXISTS public.soil_assessment
         FOREIGN KEY (farm_id) REFERENCES public."Farms"(farm_id)
         ON DELETE CASCADE
 );
+
+-- Table: public.suppliers
+CREATE TABLE public.suppliers (
+    supplier_id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    contact_person TEXT,
+    phone TEXT,
+    email TEXT,
+    address TEXT,
+    category TEXT, -- e.g., seeds, fertilizers, feeds, equipment
+    rating NUMERIC(3,2) DEFAULT 0.00,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- order tables
+-- Table: public.purchase_orders & public.sales_orders
+CREATE TABLE public.purchase_orders (
+    po_id BIGSERIAL PRIMARY KEY,
+
+    coop_id BIGINT,
+    farm_id BIGINT,
+    supplier_id BIGINT NOT NULL,
+
+    ordered_by TEXT NOT NULL,  -- 'coop' or 'farm'
+
+    items JSONB NOT NULL,      -- list of purchased items
+    total_amount NUMERIC(10,2) DEFAULT 0.00,
+
+    status TEXT DEFAULT 'Pending',  
+    -- Pending, Approved, Processing, Completed, Cancelled
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+
+    CONSTRAINT fk_supplier
+        FOREIGN KEY (supplier_id)
+        REFERENCES public.suppliers(supplier_id)
+        ON DELETE SET NULL
+);
+
+CREATE TABLE public.sales_orders (
+    so_id BIGSERIAL PRIMARY KEY,
+    coop_id BIGINT,
+    farm_id BIGINT,
+    vendor_id BIGINT NOT NULL,
+
+    items JSONB NOT NULL,       -- harvested products sold
+    total_amount NUMERIC(10,2) DEFAULT 0.00,
+
+    status TEXT DEFAULT 'Pending',
+    -- Pending, Confirmed, Packed, Out for Delivery, Completed, Cancelled
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+
+    CONSTRAINT fk_vendor
+        FOREIGN KEY (vendor_id)
+        REFERENCES public.vendors(vendor_id)
+        ON DELETE SET NULL
+);

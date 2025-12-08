@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+
 import {
   Card,
   CardHeader,
@@ -60,10 +62,10 @@ const CoopPanel: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Cooperatives Directory</CardTitle>
-          <CardDescription>
-            All registered cooperatives in the platform
-          </CardDescription>
+            <CardTitle>Cooperatives Directory</CardTitle>
+            <CardDescription>
+              All registered cooperatives in the platform
+            </CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -76,12 +78,16 @@ const CoopPanel: React.FC = () => {
                 
                 <TableHead>Address</TableHead>
                 <TableHead>Region</TableHead>
-                <TableHead>Contact Person</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>
+                  Contact Person/
+                  Phone/
+                  Email
+                </TableHead>
+                
                 <TableHead>Established</TableHead>
 
                 <TableHead>Status</TableHead>
+                <TableHead>{/* col for buttons */}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -94,9 +100,11 @@ const CoopPanel: React.FC = () => {
                   
                   <TableCell>{coop.address || "-"}</TableCell>
                   <TableCell>{coop.region || "-"}</TableCell>
-                  <TableCell>{coop.contact_person || "-"}</TableCell>
-                  <TableCell>{coop.phone || "-"}</TableCell>
-                  <TableCell>{coop.email || "-"}</TableCell>
+                  <TableCell>
+                    <div className="font-bold">{coop.contact_person || "-"}</div>
+                    <div>{coop.phone || "-"}</div>
+                    <div>{coop.email || "-"}</div>
+                  </TableCell>
                   <TableCell>
                     {coop.established_at
                       ? new Date(coop.established_at).toLocaleDateString()
@@ -104,6 +112,24 @@ const CoopPanel: React.FC = () => {
                   </TableCell>
 
                     <TableCell>{coop.status}</TableCell>
+
+                  <TableCell>
+                          <div className="flex items-center gap-4 align-right">
+      <Button 
+        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl"
+        //nClick={onBuy}
+      >
+        BUY
+      </Button>
+
+      <Button 
+        className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl"
+        //onClick={onSell}
+      >
+        SELL
+      </Button>
+    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

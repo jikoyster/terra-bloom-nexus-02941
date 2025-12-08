@@ -14,7 +14,7 @@ import FarmsPanel from '@/components/dashboard/farms/FarmsPanel';
 import CoopPanel from '@/components/dashboard/cooperatives/CoopPanel';
 
 import AdminPanel from '@/components/dashboard/AdminPanel';
-import TradingPlatform from '@/components/dashboard/TradingPlatform';
+//import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
 const Dashboard = () => {
   const [activeView, setActiveView] = useState('farmsPanel');
@@ -92,7 +92,7 @@ const Dashboard = () => {
             <TabsTrigger value="cooperative" className="flex items-center gap-2"><Group className="h-4 w-4" /> Co-op</TabsTrigger>
 
             <TabsTrigger value="erp" className="flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> ERP</TabsTrigger>            
-            <TabsTrigger value="market" className="flex items-center gap-2"><Store className="h-4 w-4" /> Market</TabsTrigger>
+            
             <TabsTrigger value="admin" className="flex items-center gap-2"><Users className="h-4 w-4" /> Admin</TabsTrigger>
           </TabsList>
 
@@ -126,7 +126,7 @@ const Dashboard = () => {
           <TabsContent value="vendors" className="mt-6"><VendorMarketplace /></TabsContent>
           <TabsContent value="erp" className="mt-6"><ERPLayer /></TabsContent>
           <TabsContent value="cooperative" className="mt-6"><CoopPanel /></TabsContent>
-          <TabsContent value="market" className="mt-6"><TradingPlatform /></TabsContent>
+        
           <TabsContent value="admin" className="mt-6"><AdminPanel /></TabsContent>
         </Tabs>
       </div>
