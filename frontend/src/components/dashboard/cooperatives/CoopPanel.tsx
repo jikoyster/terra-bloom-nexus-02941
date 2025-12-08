@@ -114,21 +114,31 @@ const CoopPanel: React.FC = () => {
                     <TableCell>{coop.status}</TableCell>
 
                   <TableCell>
-                          <div className="flex items-center gap-4 align-right">
-      <Button 
-        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl"
-        //nClick={onBuy}
-      >
-        BUY
-      </Button>
+                    <div className="flex items-center gap-4 align-right">
+                      <Button 
+                        disabled={coop.status === "Inactive"}
+                        className={`px-6 py-2 rounded-xl text-white ${
+                                  coop.status === "Inactive"
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-green-600 hover:bg-green-700"
+                                }`}
+                        //nClick={onBuy}
+                      >
+                        BUY
+                      </Button>
 
-      <Button 
-        className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl"
-        //onClick={onSell}
-      >
-        SELL
-      </Button>
-    </div>
+                      <Button 
+                        disabled={coop.status === "Inactive"}
+                        className={`px-6 py-2 rounded-xl text-white ${
+                                  coop.status === "Inactive"
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-red-600 hover:bg-red-700"
+                                }`}
+                        //onClick={onSell}
+                      >
+                        SELL
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
