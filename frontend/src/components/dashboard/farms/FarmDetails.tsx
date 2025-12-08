@@ -66,7 +66,7 @@ const FarmDetails: React.FC<FarmDetailsProps> = ({ farmId }) => {
   if (!farm) return <p>Farm not found.</p>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-y-auto max-h-screen p-4">
       <Card>
         <CardHeader>
           <CardTitle>{farm.name}</CardTitle>
@@ -90,32 +90,36 @@ const FarmDetails: React.FC<FarmDetailsProps> = ({ farmId }) => {
           {assessments.length === 0 ? (
             <p>No soil assessments available.</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>pH Level</TableHead>
-                  <TableHead>Nitrogen</TableHead>
-                  <TableHead>Phosphorus</TableHead>
-                  <TableHead>Potassium</TableHead>
-                  <TableHead>Organic Matter</TableHead>
-                  <TableHead>Notes</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {assessments.map((a) => (
-                  <TableRow key={a.assessment_id}>
-                    <TableCell>{new Date(a.assessment_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{a.ph_level}</TableCell>
-                    <TableCell>{a.nitrogen}</TableCell>
-                    <TableCell>{a.phosphorus}</TableCell>
-                    <TableCell>{a.potassium}</TableCell>
-                    <TableCell>{a.organic_matter}</TableCell>
-                    <TableCell>{a.notes || "-"}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+           <div className="space-y-6">
+  {assessments.map((a) => (
+    <div 
+      key={a.assessment_id} 
+      className="grid grid-cols-2 gap-x-4 gap-y-2 bg-white"
+    >
+      <div className="font-semibold">Date</div>
+      <div>{new Date(a.assessment_date).toLocaleDateString()}</div>
+
+      <div className="font-semibold">pH Level</div>
+      <div>{a.ph_level}</div>
+
+      <div className="font-semibold">Nitrogen</div>
+      <div>{a.nitrogen}</div>
+
+      <div className="font-semibold">Phosphorus</div>
+      <div>{a.phosphorus}</div>
+
+      <div className="font-semibold">Potassium</div>
+      <div>{a.potassium}</div>
+
+      <div className="font-semibold">Organic Matter</div>
+      <div>{a.organic_matter}</div>
+
+      <div className="font-semibold">Notes</div>
+      <div>{a.notes || "-"}</div>
+    </div>
+  ))}
+</div>
+
           )}
         </CardContent>
       </Card>

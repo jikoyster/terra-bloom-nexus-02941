@@ -31,6 +31,15 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  const getPhilippineSeason = () => {
+    const month = new Date().getMonth() + 1;
+
+    if (month >= 12 || month <= 2) return "Cool Dry Season";
+    if (month >= 3 && month <= 5) return "Hot Dry Season";
+    return "Wet/Rainy Season";
+  };
+  const season = getPhilippineSeason();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -49,10 +58,10 @@ const Dashboard = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-foreground">Co-op Manager</h2>
+              <h2 className="text-xl font-bold text-foreground">{/*add your desc here*/}</h2>
               <div className="flex items-center gap-4 mt-1">
-                <span className="text-sm text-muted-foreground">Mindanao Valley Co-operative</span>
-                <Badge variant="outline">Season: Wet 2024</Badge>
+                <span className="text-sm text-muted-foreground"> {/*add your desc here*/} </span>
+                <Badge variant="outline">Season: {season}</Badge>
                 <Button variant="outline" size="sm" onClick={() => window.location.href = '/vendor-dashboard'} className="ml-4">Switch to Vendor View</Button>
                 <Button variant="outline" size="sm" onClick={() => window.location.href = '/farmer-dashboard'}>Switch to Farmer View</Button>
               </div>
