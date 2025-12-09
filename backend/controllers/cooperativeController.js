@@ -45,3 +45,10 @@ exports.createCooperative = async (req, res) => {
     res.status(500).json({ error: "Failed to create cooperative" });
   }
 };
+
+exports.getCooperativeById = async (req, res) => {
+  const { id } = req.params;
+  const coop = await Cooperative.findByPk(id);
+  if (!coop) return res.status(404).json({ error: "Cooperative not found" });
+  res.json(coop);
+};

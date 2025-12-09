@@ -13,6 +13,9 @@ import FarmDetails from "@/components/dashboard/farms/FarmDetails";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
+import CoopPanel from "@/components/dashboard/cooperatives/CoopPanel";
+import Buy from "@/components/dashboard/cooperatives/Buy";
+
 const queryClient = new QueryClient();
 
 // Helper function to check login
@@ -41,6 +44,8 @@ const App = () => (
           <Route path="/farms" element={<ProtectedRoute><FarmsPanel /></ProtectedRoute>} />
           <Route path="/farms/:id" element={<ProtectedRoute><FarmDetails /></ProtectedRoute>} />
           
+          <Route path="/coops" element={<CoopPanel />} />
+          <Route path="/buy/:coop_id" element={<Buy />} />
 
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />

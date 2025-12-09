@@ -7,6 +7,8 @@ const { sequelize } = require("./models"); // don't destructure Farm here
 const farmController = require("./controllers/farmController");
 const farmerController = require("./controllers/farmerController");
 
+const cooperativeController = require("./controllers/cooperativeController");
+
 const authRoutes = require("./routes/auth");
 const farmerRoutes = require("./routes/farmers");
 const vendorRoutes = require("./routes/vendors");
@@ -32,6 +34,7 @@ app.use("/api/farmers", farmerRoutes);
 app.use("/api/vendors", vendorRoutes);
 // Cooperative routes
 app.use("/api/cooperatives", cooperativeRoutes);
+app.get("/api/cooperatives/:id", cooperativeController.getCooperativeById);
 // Auth routes
 app.use("/api/auth", authRoutes);
 
