@@ -22,8 +22,8 @@ exports.createCooperative = async (req, res) => {
       contact_person,
       phone,
       email,
-      members_count,
       established_at,
+      sector_specialization,
     } = req.body;
 
     const newCoop = await Cooperative.create({
@@ -35,8 +35,8 @@ exports.createCooperative = async (req, res) => {
       contact_person,
       phone,
       email,
-      members_count,
       established_at,
+      sector_specialization,
     });
 
     res.json(newCoop);

@@ -1,3 +1,4 @@
+//controllers/vendorController.js
 const { Vendor, VendorCategory } = require("../models");
 
 exports.getAllVendors = async (req, res) => {

@@ -12,8 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       contact_person: { type: DataTypes.STRING, allowNull: true },
       phone: { type: DataTypes.STRING, allowNull: true },
       email: { type: DataTypes.STRING, allowNull: true },
-      members_count: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 0 },
+      
       established_at: { type: DataTypes.DATEONLY, allowNull: true },
+      sector_specialization: { type: DataTypes.STRING, allowNull: true },
       created_at: { type: DataTypes.DATE, allowNull: true },
       updated_at: { type: DataTypes.DATE, allowNull: true },
     },

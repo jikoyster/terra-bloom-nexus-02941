@@ -73,7 +73,6 @@ const CoopPanel: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Registration No.</TableHead>
                 
@@ -88,14 +87,13 @@ const CoopPanel: React.FC = () => {
                 <TableHead>Established</TableHead>
 
                 <TableHead>Status</TableHead>
-                <TableHead className="text-center">Cooperative Exchange Management</TableHead>
+                <TableHead className="text-center">Sector Specialization</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {coops.map((coop) => (
                 <TableRow key={coop.coop_id}>
-                  <TableCell>{coop.coop_id}</TableCell>
                   <TableCell className='text-[1em] w-[12%] font-medium text-green-700'>{coop.name}</TableCell>
                   <TableCell>{coop.registration_no || "-"}</TableCell>
                   
@@ -112,48 +110,11 @@ const CoopPanel: React.FC = () => {
                       : "-"}
                   </TableCell>
 
-                    <TableCell>{coop.status}</TableCell>
+                  <TableCell>{coop.status}</TableCell>
 
-                  <TableCell>
-                    <div className="flex items-center gap-4 align-right">
-                      {coop.status === "Active" ? (
-                        <Link to={`/buy/${coop.coop_id}`}>
-                          <Button
-                            className="px-6 py-2 rounded-xl text-white bg-green-600 hover:bg-green-700"
-                          >
-                            BUY
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Button
-                          disabled
-                          className="px-6 py-2 rounded-xl text-white bg-gray-400 cursor-not-allowed"
-                        >
-                          BUY
-                        </Button>
-                      )}
-
-                      {/*sell button*/}
-                      {coop.status === "Active" ? (
-                        <Link to={`/sell/${coop.coop_id}`}>
-                          <Button
-                            className="px-6 py-2 rounded-xl text-white bg-red-600 hover:bg-red-700"
-                          >
-                            SELL
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Button
-                          disabled
-                          className="px-6 py-2 rounded-xl text-white bg-gray-400 cursor-not-allowed"
-                        >
-                          SELL
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
+                  <TableCell>{coop.sector_specialization}</TableCell>                  
                 </TableRow>
-              ))}
+              ))}              
             </TableBody>
           </Table>
         </CardContent>

@@ -17,7 +17,7 @@ import AdminPanel from '@/components/dashboard/AdminPanel';
 //import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
 const Dashboard = () => {
-  const [activeView, setActiveView] = useState('farmsPanel');
+  const [activeView, setActiveView] = useState('vendors');
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
     { id: 2, type: 'request', message: '3 loan applications pending approval', priority: 'medium' },

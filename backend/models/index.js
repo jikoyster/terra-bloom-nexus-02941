@@ -28,7 +28,14 @@ fs.readdirSync(__dirname)
     db[model.name] = model;
   });
 
-// Example associations
+// Call associate() for each model, if it exists
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
+
+// Optional: your other associations
 if (db.Farm && db.SoilAssessment) {
   db.Farm.hasMany(db.SoilAssessment, { foreignKey: "farm_id" });
   db.SoilAssessment.belongsTo(db.Farm, { foreignKey: "farm_id" });
