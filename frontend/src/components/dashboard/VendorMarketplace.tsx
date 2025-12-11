@@ -51,7 +51,7 @@ const VendorMarketplace = () => {
       {/* Header Actions */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Vendor Marketplace</h2>
+          <h2 className="text-2xl font-bold">Vendors</h2>
           <p className="text-muted-foreground">Manage and onboard supply chain partners</p>
         </div>
         <Button className="flex items-center gap-2">
@@ -63,11 +63,8 @@ const VendorMarketplace = () => {
       {/* Search and Filters */}
       <VendorSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
-      {/* Vendor Stats */}
-      <VendorStats />
-
       {/* Vendors Table */}
-      <VendorTable vendors={vendors} />
+      <VendorTable/>
 
       {/* Pending Vendor Applications */}
       <PendingVendorApplications />

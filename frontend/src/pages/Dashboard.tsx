@@ -17,7 +17,7 @@ import AdminPanel from '@/components/dashboard/AdminPanel';
 //import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
 const Dashboard = () => {
-  const [activeView, setActiveView] = useState('vendors');
+  const [activeView, setActiveView] = useState('farms');
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
     { id: 2, type: 'request', message: '3 loan applications pending approval', priority: 'medium' },
@@ -93,9 +93,9 @@ const Dashboard = () => {
       {/* Navigation Tabs */}
       <div className="container mx-auto px-6 py-4">
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
             <TabsTrigger value="overview" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Overview</TabsTrigger>
-            <TabsTrigger value="farmsPanel" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
+            <TabsTrigger value="farms" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
             <TabsTrigger value="farmers" className="flex items-center gap-2"><Users className="h-4 w-4" /> Farmers</TabsTrigger>
             <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger>
             <TabsTrigger value="cooperative" className="flex items-center gap-2"><Group className="h-4 w-4" /> Co-op</TabsTrigger>
@@ -130,7 +130,7 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="farmsPanel" className="mt-6"><FarmsPanel /></TabsContent>
+          <TabsContent value="farms" className="mt-6"><FarmsPanel /></TabsContent>
           <TabsContent value="farmers" className="mt-6"><FarmersPanel /></TabsContent>
           <TabsContent value="vendors" className="mt-6"><VendorMarketplace /></TabsContent>
           <TabsContent value="erp" className="mt-6"><ERPLayer /></TabsContent>

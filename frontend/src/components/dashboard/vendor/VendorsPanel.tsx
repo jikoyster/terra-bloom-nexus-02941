@@ -82,18 +82,8 @@ const VendorsPanel = () => {
           <CardTitle>Registered Vendors</CardTitle>
           <CardDescription>All vendors in the system</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-end mb-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowPhone(!showPhone)}
-              className="flex items-center gap-2"
-            >
-              {showPhone ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              {showPhone ? "Hide Phone" : "Show Phone"}
-            </Button>
-          </div>
 
+        <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
@@ -101,8 +91,7 @@ const VendorsPanel = () => {
                 <TableHead>Category</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Address</TableHead>
-                {showPhone && <TableHead>Phone</TableHead>}
-                <TableHead>Email</TableHead>
+                <TableHead>Contact Info</TableHead>
                 <TableHead>Created At</TableHead>
               </TableRow>
             </TableHeader>
@@ -113,8 +102,10 @@ const VendorsPanel = () => {
                   <TableCell>{vendor.category_name || "-"}</TableCell>
                   <TableCell>{vendor.status}</TableCell>
                   <TableCell>{vendor.address || "-"}</TableCell>
-                  {showPhone && <TableCell>{vendor.phone}</TableCell>}
-                  <TableCell>{vendor.email || "-"}</TableCell>
+                  <TableCell>
+                    <div>- {vendor.email || "-"}</div>
+                    <div>- {vendor.phone}</div>
+                  </TableCell>
                   <TableCell>{new Date(vendor.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</TableCell>
                 </TableRow>
               ))}

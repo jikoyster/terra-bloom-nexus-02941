@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from "@/components/ui/button";
+
 import FarmDetails from './FarmDetails'; // <-- make sure this path is correct
 import { Link,  SquareArrowOutUpRight } from 'lucide-react';
 
@@ -103,14 +105,31 @@ const FarmsPanel = () => {
                   <TableCell>{farm.hectares || '-'} ha</TableCell>
                   <TableCell>{farm.carbon_sequestered || '-'} tCO2</TableCell>
 
-                  <TableCell>
-                    <button
-                      className="text-blue-600 hover:underline"
-                      onClick={() => openFarmModal(farm.farm_id)}
-                    >
-                      View Details
-                    </button>
+                  
+<TableCell>
+                    <div className="flex items-center gap-4 align-right">
+                      
+                        {/* <Link to={`/buy/${coop.coop_id}`}> */}
+                          <Button
+                            className="px-6 py-2 rounded-xl text-white bg-green-600 hover:bg-green-700"
+                          >
+                            BUY
+                          </Button>
+                        {/*</Link>*/}
+                      
+
+                      {/*sell button*/}
+                        {/*<Link to={`/sell/${coop.coop_id}`}>*/}
+                          <Button
+                            className="px-6 py-2 rounded-xl text-white bg-red-600 hover:bg-red-700"
+                          >
+                            SELL
+                          </Button>
+                        {/*</Link>*/}
+                      
+                    </div>
                   </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>
