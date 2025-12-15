@@ -34,9 +34,9 @@ const Buy: React.FC = () => {
   if (!coop) return <p className="p-6">Cooperative not found.</p>;
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-center">
       <h1 className="text-2xl font-bold">
-        Buy from: <span className="text-green-700">{coop.name}</span>
+        Buy from Suggested Co-op: <span className="text-green-700">{coop.name}</span>
       </h1>
 
       <p className="mt-2">Select items to order from this cooperative.</p>

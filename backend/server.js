@@ -1,4 +1,6 @@
 // backend/server.js
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -19,6 +21,13 @@ const app = express(); // <-- app must be declared BEFORE using it
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// AI routes
+app.use(express.json());
+
+const aiRoutes = require("./routes/aiRoutes");
+app.use("/api/ai", aiRoutes);
+//\ 
 
 // Farm routes
 app.get("/api/farms", farmController.getAllFarms);
@@ -52,4 +61,6 @@ app.use("/api/auth", authRoutes);
   } catch (err) {
     console.error("Failed to start server:", err);
   }
+
+  console.log("OpenAI key loaded:", !!process.env.OPENAI_API_KEY);
 })();

@@ -14,7 +14,7 @@ import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
 import CoopPanel from "@/components/dashboard/cooperatives/CoopPanel";
-import Buy from "@/components/dashboard/cooperatives/Buy";
+import Buy from "@/components/dashboard/farms/Buy";
 
 const queryClient = new QueryClient();
 
