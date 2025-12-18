@@ -270,3 +270,34 @@ CREATE TRIGGER trg_create_po_after_soil_assessment
 AFTER INSERT ON public.soil_assessment
 FOR EACH ROW
 EXECUTE FUNCTION create_po_from_soil_assessment();
+
+
+
+-- Table: public.crops
+
+CREATE TABLE IF NOT EXISTS public.crops
+(
+    crop_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+
+    -- Soil pH requirements
+    ph_min NUMERIC(3,1),   -- e.g. 5.5
+    ph_max NUMERIC(3,1),   -- e.g. 6.8
+
+    -- Nutrient requirements
+    nitrogen_requirement_kg_per_ha NUMERIC(10,2),
+    phosphorus_requirement_kg_per_ha NUMERIC(10,2),
+    potassium_requirement_kg_per_ha NUMERIC(10,2),
+
+    typical_yield_kg_per_ha NUMERIC(10,2),
+
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT crops_ph_check
+        CHECK (ph_min IS NULL OR ph_max IS NULL OR ph_min <= ph_max)
+);
+
+ALTER TABLE public.crops
+OWNER TO postgres;

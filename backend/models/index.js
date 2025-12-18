@@ -41,6 +41,8 @@ if (db.Farm && db.SoilAssessment) {
   db.SoilAssessment.belongsTo(db.Farm, { foreignKey: 'farm_id' });
 }
 
+db.Crop = require("./Crop")(sequelize, Sequelize.DataTypes);
+
 // 6️⃣ Test database connection
 sequelize.authenticate()
   .then(() => console.log('✅ Database connected'))
