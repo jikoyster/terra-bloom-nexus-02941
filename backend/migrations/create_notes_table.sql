@@ -171,29 +171,47 @@ CREATE TABLE public.suppliers (
 
 -- order tables
 -- Table: public.purchase_orders & public.sales_orders
-CREATE TABLE public.purchase_orders (
-    po_id BIGSERIAL PRIMARY KEY,
+CREATE OR REPLACE FUNCTION generate_po_id()
+RETURNS VARCHAR AS $$
+DECLARE
+    chars TEXT := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    result TEXT := '';
+    i INT;
+BEGIN
+    FOR i IN 1..6 LOOP
+        result := result || substr(chars, floor(random() * length(chars) + 1)::int, 1);
+    END LOOP;
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
 
-    coop_id BIGINT,
-    farm_id BIGINT,
-    supplier_id BIGINT NOT NULL,
+CREATE TABLE purchase_orders (
+    po_id VARCHAR(6) PRIMARY KEY DEFAULT generate_po_id(),
 
-    ordered_by TEXT NOT NULL,  -- 'coop' or 'farm'
+    farm_id INTEGER NOT NULL,
+    details TEXT,
 
-    items JSONB NOT NULL,      -- list of purchased items
-    total_amount NUMERIC(10,2) DEFAULT 0.00,
+    status VARCHAR(20) NOT NULL CHECK (
+        status IN ('advised', 'draft', 'submitted')
+    ),
 
-    status TEXT DEFAULT 'Pending',  
-    -- Pending, Approved, Processing, Completed, Cancelled
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fk_po_farm
+        FOREIGN KEY (farm_id)
+        REFERENCES farms(farm_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
 
-    CONSTRAINT fk_supplier
-        FOREIGN KEY (supplier_id)
-        REFERENCES public.suppliers(supplier_id)
-        ON DELETE SET NULL
+    CONSTRAINT fk_po_coop
+        FOREIGN KEY (coop_id)
+        REFERENCES cooperatives(coop_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
+
+
 
 CREATE TABLE public.sales_orders (
     so_id BIGSERIAL PRIMARY KEY,
@@ -215,3 +233,40 @@ CREATE TABLE public.sales_orders (
         REFERENCES public.vendors(vendor_id)
         ON DELETE SET NULL
 );
+
+
+-- Trigger: on new soil_assessment, create purchase orde
+-- 1. Create Function
+CREATE OR REPLACE FUNCTION create_po_from_soil_assessment()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.purchase_orders (
+        coop_id,
+        farm_id,
+        ordered_by,
+        items,
+        total_amount,
+        status
+    )
+    VALUES (
+        NULL,
+        NEW.farm_id,
+        'System (Soil Assessment)',
+        jsonb_build_object(
+            'source', 'soil_assessment',
+            'assessment_id', NEW.assessment_id,
+            'recommended_items', jsonb_build_array()
+        ),
+        0.00,
+        'Pending'
+    );
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2. Create Trigger
+CREATE TRIGGER trg_create_po_after_soil_assessment
+AFTER INSERT ON public.soil_assessment
+FOR EACH ROW
+EXECUTE FUNCTION create_po_from_soil_assessment();

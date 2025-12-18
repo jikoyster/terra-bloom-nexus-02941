@@ -62,8 +62,7 @@ const Dashboard = () => {
               <div className="flex items-center gap-4 mt-1">
                 <span className="text-sm text-muted-foreground"> {/*add your desc here*/} </span>
                 <Badge variant="outline">Season: {season}</Badge>
-                <Button variant="outline" size="sm" onClick={() => window.location.href = '/vendor-dashboard'} className="ml-4">Switch to Vendor View</Button>
-                <Button variant="outline" size="sm" onClick={() => window.location.href = '/farmer-dashboard'}>Switch to Farmer View</Button>
+                
               </div>
             </div>
 
@@ -97,15 +96,12 @@ const Dashboard = () => {
       {/* Navigation Tabs */}
       <div className="container mx-auto px-6 py-4">
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-          <TabsList className="grid w-full grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+          <TabsList className="grid w-full grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
             <TabsTrigger value="overview" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Overview</TabsTrigger>
             <TabsTrigger value="farms" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
             <TabsTrigger value="farmers" className="flex items-center gap-2"><Users className="h-4 w-4" /> Farmers</TabsTrigger>
             <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger>
             <TabsTrigger value="cooperative" className="flex items-center gap-2"><Group className="h-4 w-4" /> Co-op</TabsTrigger>
-
-            <TabsTrigger value="erp" className="flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> ERP</TabsTrigger>            
-            
             <TabsTrigger value="admin" className="flex items-center gap-2"><Users className="h-4 w-4" /> Admin</TabsTrigger>
           </TabsList>
 

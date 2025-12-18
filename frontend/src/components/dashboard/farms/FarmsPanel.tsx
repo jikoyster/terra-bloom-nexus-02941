@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from "@/components/ui/button";
 
 import FarmDetails from './FarmDetails';
-import { SquareArrowOutUpRight } from 'lucide-react';
+import { Bell, Delete, Edit, SquareArrowOutUpRight } from 'lucide-react';
 
 interface Farm {
   created_at: string | number | Date;
@@ -82,8 +82,8 @@ const FarmsPanel = () => {
                 <TableHead>Crops</TableHead>
                 <TableHead>Yield</TableHead>
                 <TableHead>Size (ha)</TableHead>
-                <TableHead>CO₂ Sequestered</TableHead>
-                <TableHead></TableHead>
+                <TableHead className='w-[10%] text-center'>Farm Transactions</TableHead> 
+                <TableHead className='w-[10%] text-center'>Notifs</TableHead> 
               </TableRow>
             </TableHeader>
 
@@ -104,7 +104,6 @@ const FarmsPanel = () => {
                   <TableCell>{farm.crops || '-'}</TableCell>
                   <TableCell>{farm.yield ? `${farm.yield} kg/ha` : '-'}</TableCell>
                   <TableCell>{farm.hectares ? `${farm.hectares} ha` : '-'}</TableCell>
-                  <TableCell>{farm.carbon_sequestered || '-'} tCO2</TableCell>
 
                   {/* BUY / SELL */}
                   <TableCell>
@@ -128,7 +127,10 @@ const FarmsPanel = () => {
 
                     </div>
                   </TableCell>
-
+                  <TableCell className='flex justify-center'>
+                    <Edit className="h-5 w-5 text-gray-600 hover:text-gray-800 cursor-pointer" />
+                    <Delete className="h-5 w-5 text-red-600 hover:text-red-800 cursor-pointer ml-4" />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
