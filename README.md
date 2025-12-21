@@ -5,7 +5,7 @@ on both backend/ and frontend/
 
 ```
 DATABASE: apdb
-This is a postgreSQL database. Just import the sample db structure to you pgAdmin.
-download the database here >> https://drive.google.com/file/d/19gndmLYNb08ihsvwgqaI11iTWFq3nEDi/view?usp=drive_link
+This is a postgreSQL database. Just import the sample db structure to your pgAdmin.
+download the database here >> https://drive.google.com/file/d/1ffSnLJybaYGglRBJuKirdq3zq0FUuCkq/view?usp=drive_link
 ```
 > by Aehter Protocol
