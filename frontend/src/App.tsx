@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 
 import CoopPanel from "@/components/dashboard/cooperatives/CoopPanel";
 import Buy from "@/components/dashboard/farms/Buy";
+import Sell from "@/components/dashboard/farms/Sell";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,8 @@ const App = () => (
           
           <Route path="/coops" element={<CoopPanel />} />
           <Route path="/buy/:coop_id" element={<Buy />} />
+
+          <Route path="/sell" element={<Sell />} />
 
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />

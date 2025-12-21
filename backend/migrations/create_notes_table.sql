@@ -155,20 +155,6 @@ CREATE TABLE IF NOT EXISTS public.soil_assessment
         ON DELETE CASCADE
 );
 
--- Table: public.suppliers
-CREATE TABLE public.suppliers (
-    supplier_id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    contact_person TEXT,
-    phone TEXT,
-    email TEXT,
-    address TEXT,
-    category TEXT, -- e.g., seeds, fertilizers, feeds, equipment
-    rating NUMERIC(3,2) DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-
 -- order tables
 -- Table: public.purchase_orders & public.sales_orders
 CREATE OR REPLACE FUNCTION generate_po_id()
@@ -185,11 +171,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+
 CREATE TABLE purchase_orders (
     po_id VARCHAR(6) PRIMARY KEY DEFAULT generate_po_id(),
 
+    coop_id INTEGER,
     farm_id INTEGER NOT NULL,
-    details TEXT,
+
+    notes TEXT,
 
     status VARCHAR(20) NOT NULL CHECK (
         status IN ('advised', 'draft', 'submitted')
@@ -210,6 +200,7 @@ CREATE TABLE purchase_orders (
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
+
 
 
 

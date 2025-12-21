@@ -120,7 +120,8 @@ const FarmsPanel = () => {
                       {/* Sell button */}
                       <Button
                         className="px-6 py-2 rounded-xl text-white bg-red-600 hover:bg-red-700"
-                        onClick={() => navigate(`/sell/${farm.farm_id}`)}
+                        onClick={() => navigate(`/sell`)}
+                        //onClick={() => navigate(`/sell/${farm.farm_id}`)}
                       >
                         SELL
                       </Button>

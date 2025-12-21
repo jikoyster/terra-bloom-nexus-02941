@@ -1,11 +1,19 @@
+// models/PurchaseOrder.js
 module.exports = (sequelize, DataTypes) => {
   const PurchaseOrder = sequelize.define('PurchaseOrder', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    po_id: { 
+      type: DataTypes.STRING(6), 
+      primaryKey: true, 
+      defaultValue: sequelize.literal("generate_po_id()") 
+    },
     farm_id: { type: DataTypes.INTEGER, allowNull: false },
+    sector_specialization: { type: DataTypes.STRING },
+    notes: { type: DataTypes.TEXT },
     status: { type: DataTypes.STRING, allowNull: false },
-    details: { type: DataTypes.STRING },
+    created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
   }, {
-    tableName: 'purchase_orders', // exact table name in Postgres
+    tableName: 'purchase_orders',
     timestamps: false,
   });
 

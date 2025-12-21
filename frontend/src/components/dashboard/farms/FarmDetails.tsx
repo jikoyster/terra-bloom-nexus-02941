@@ -214,7 +214,7 @@ const FarmDetails: React.FC<FarmDetailsProps> = ({ farmId }) => {
               <TableHeader>
                 <TableRow>
                   <TableHead>PO #</TableHead>
-                  <TableHead>Details</TableHead>
+                  <TableHead>Notes</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -223,7 +223,7 @@ const FarmDetails: React.FC<FarmDetailsProps> = ({ farmId }) => {
                 {purchaseOrders.map((po) => (
                   <TableRow key={po.po_id}>
                     <TableCell>{po.po_id}</TableCell>
-                    <TableCell>{po.details}</TableCell>
+                    <TableCell>{po.notes}</TableCell>
                     
                     <TableCell>
                       {new Date(po.created_at).toLocaleDateString()}

@@ -39,12 +39,13 @@ const getPurchaseOrdersByFarm = async (req, res) => {
  */
 const createPurchaseOrder = async (req, res) => {
   try {
-    const { po_id, farm_id, status, details } = req.body;
+    const { po_id, farm_id, status, notes, sector_specialization } = req.body;
     const newOrder = await PurchaseOrder.create({
       po_id,
       farm_id,
       status,
-      details,
+      notes,
+      sector_specialization,
     });
     console.log('Created purchase order:', newOrder);
     res.status(201).json(newOrder);
@@ -60,12 +61,12 @@ const createPurchaseOrder = async (req, res) => {
 const updatePurchaseOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { po_id, farm_id, status, details } = req.body;
+    const { po_id, farm_id, status, notes, sector_specialization } = req.body;
 
     const order = await PurchaseOrder.findByPk(id);
     if (!order) return res.status(404).json({ error: 'Purchase order not found' });
 
-    await order.update({ po_id, farm_id, status, details });
+    await order.update({ po_id, farm_id, status, notes, sector_specialization });
     console.log('Updated purchase order:', order);
     res.json(order);
   } catch (err) {
