@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Users, ShoppingBag, Leaf, DollarSign, TrendingUp, AlertTriangle, Store, Home } from 'lucide-react';
+import { Bell, Users, ShoppingBag, Leaf, TrendingUp, Building2, Settings, Tractor } from 'lucide-react';
 import KPISummary from '@/components/dashboard/KPISummary';
 import FarmersPanel from '@/components/dashboard/FarmersPanel';
 import VendorMarketplace from '@/components/dashboard/VendorMarketplace';
@@ -88,37 +88,28 @@ const Dashboard = () => {
       {/* Navigation Tabs */}
       <div className="container mx-auto px-6 py-4">
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="farmers" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Farmers
+            <TabsTrigger value="farms" className="flex items-center gap-2">
+              <Tractor className="h-4 w-4" />
+              <span className="flex flex-col items-start leading-tight">
+                <span>Farms</span>
+                <span className="text-xs text-muted-foreground font-normal">Farmers</span>
+              </span>
             </TabsTrigger>
             <TabsTrigger value="vendors" className="flex items-center gap-2">
               <ShoppingBag className="h-4 w-4" />
               Vendors
             </TabsTrigger>
-            <TabsTrigger value="erp" className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              ERP
-            </TabsTrigger>
-            <TabsTrigger value="carbon" className="flex items-center gap-2">
-              <Leaf className="h-4 w-4" />
-              Carbon
-            </TabsTrigger>
-            <TabsTrigger value="finance" className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Finance
-            </TabsTrigger>
-            <TabsTrigger value="market" className="flex items-center gap-2">
-              <Store className="h-4 w-4" />
-              Market
+            <TabsTrigger value="coop" className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              Coop
             </TabsTrigger>
             <TabsTrigger value="admin" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
               Admin
             </TabsTrigger>
           </TabsList>
@@ -155,7 +146,7 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="farmers" className="mt-6">
+          <TabsContent value="farms" className="mt-6">
             <FarmersPanel />
           </TabsContent>
 
@@ -163,20 +154,15 @@ const Dashboard = () => {
             <VendorMarketplace />
           </TabsContent>
 
-          <TabsContent value="erp" className="mt-6">
-            <ERPLayer />
-          </TabsContent>
-
-          <TabsContent value="carbon" className="mt-6">
-            <CarbonDashboard />
-          </TabsContent>
-
-          <TabsContent value="finance" className="mt-6">
-            <FinanceDashboard />
-          </TabsContent>
-
-          <TabsContent value="market" className="mt-6">
-            <TradingPlatform />
+          <TabsContent value="coop" className="mt-6">
+            <div className="grid gap-6">
+              <ERPLayer />
+              <div className="grid md:grid-cols-2 gap-6">
+                <CarbonDashboard />
+                <FinanceDashboard />
+              </div>
+              <TradingPlatform />
+            </div>
           </TabsContent>
 
           <TabsContent value="admin" className="mt-6">
