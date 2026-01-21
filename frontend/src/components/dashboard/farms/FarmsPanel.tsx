@@ -83,7 +83,7 @@ const FarmsPanel = () => {
                 <TableHead>Yield</TableHead>
                 <TableHead>Size (ha)</TableHead>
                 <TableHead className='w-[10%] text-center'>Farm Transactions</TableHead> 
-                <TableHead className='w-[10%] text-center'>Notifs</TableHead> 
+                <TableHead className='w-[10%] text-center'> </TableHead> 
               </TableRow>
             </TableHeader>
 
@@ -129,8 +129,8 @@ const FarmsPanel = () => {
                     </div>
                   </TableCell>
                   <TableCell className='flex justify-center'>
-                    <Edit className="h-5 w-5 text-gray-600 hover:text-gray-800 cursor-pointer" />
-                    <Delete className="h-5 w-5 text-red-600 hover:text-red-800 cursor-pointer ml-4" />
+                    <div title="Edit Farm"><Edit className="h-5 w-5 text-gray-600 hover:text-gray-800 cursor-pointer" /></div>
+                    <div title="Delete Farm"><Delete className="h-5 w-5 text-red-600 hover:text-red-800 cursor-pointer ml-4" /></div>
                   </TableCell>
                 </TableRow>
               ))}

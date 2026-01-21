@@ -94,13 +94,13 @@ const Dashboard = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="container mx-auto px-6 py-4">
+      <div className="container mx-auto px-5 py-4">
         <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-          <TabsList className="grid w-full grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+          <TabsList className="grid w-full grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
             <TabsTrigger value="overview" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Overview</TabsTrigger>
             <TabsTrigger value="farms" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
             <TabsTrigger value="farmers" className="flex items-center gap-2"><Users className="h-4 w-4" /> Farmers</TabsTrigger>
-            <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger>
+            {/* <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger> */}
             <TabsTrigger value="cooperative" className="flex items-center gap-2"><Group className="h-4 w-4" /> Co-op</TabsTrigger>
             <TabsTrigger value="admin" className="flex items-center gap-2"><Users className="h-4 w-4" /> Admin</TabsTrigger>
           </TabsList>
