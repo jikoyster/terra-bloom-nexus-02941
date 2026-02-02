@@ -95,14 +95,16 @@ const Dashboard = () => {
 
       {/* Navigation Tabs */}
       <div className="container mx-auto px-5 py-4">
-        <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-          <TabsList className="grid w-full grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+        <Tabs defaultValue="overview" value={activeView} onValueChange={setActiveView} className="w-full">
+          <TabsList className="grid w-full grid-cols-1  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2">
             <TabsTrigger value="overview" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Overview</TabsTrigger>
-            <TabsTrigger value="farms" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
+            <TabsTrigger value="agriRegistry" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Agri Registry</TabsTrigger>
+            {/*<TabsTrigger value="farms" className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Farms</TabsTrigger>
             <TabsTrigger value="farmers" className="flex items-center gap-2"><Users className="h-4 w-4" /> Farmers</TabsTrigger>
-            {/* <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger> */}
-            <TabsTrigger value="cooperative" className="flex items-center gap-2"><Group className="h-4 w-4" /> Co-op</TabsTrigger>
+            <TabsTrigger value="vendors" className="flex items-center gap-2"><ShoppingBag className="h-4 w-4" /> Vendors</TabsTrigger> 
+            <TabsTrigger value="cooperative" className="flex items-center gap-2"><Group className="h-4 w-4" /> Co-op</TabsTrigger>*/}
             <TabsTrigger value="admin" className="flex items-center gap-2"><Users className="h-4 w-4" /> Admin</TabsTrigger>
+            <TabsTrigger value="admin2" className="flex items-center gap-2"><Users className="h-4 w-4" /> Messages</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -130,7 +132,23 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="farms" className="mt-6"><FarmsPanel /></TabsContent>
+          <TabsContent value="agriRegistry" className="mt-6">
+
+            <Tabs defaultValue="FarmsPanel" className="w-full">
+              <TabsList className="grid w-full grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 mb-3">
+                <TabsTrigger value="FarmsPanel">Farms Registry</TabsTrigger>
+                <TabsTrigger value="FarmersPanel">Farmers Registry</TabsTrigger>
+                <TabsTrigger value="CoopPanel">Cooperatives Registry</TabsTrigger>
+                
+                
+              </TabsList>
+              <TabsContent value="FarmsPanel" className="mt-6"><FarmsPanel /></TabsContent>
+              <TabsContent value="FarmersPanel" className="mt-6"><FarmersPanel /></TabsContent>
+              <TabsContent value="CoopPanel" className="mt-6"><CoopPanel /></TabsContent>
+            </Tabs>
+          </TabsContent>
+
+
           <TabsContent value="farmers" className="mt-6"><FarmersPanel /></TabsContent>
           <TabsContent value="vendors" className="mt-6"><VendorMarketplace /></TabsContent>
           <TabsContent value="erp" className="mt-6"><ERPLayer /></TabsContent>
