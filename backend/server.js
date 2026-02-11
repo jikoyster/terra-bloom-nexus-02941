@@ -13,11 +13,11 @@ const cooperativeController = require("./controllers/cooperativeController");
 
 const authRoutes = require("./routes/auth");
 const farmerRoutes = require("./routes/farmers");
-const vendorRoutes = require("./routes/vendors");
 const cooperativeRoutes = require("./routes/cooperatives");
 const soilRoutes = require("./routes/soilAssessmentRoutes");
 const purchaseOrdersRoutes = require("./routes/purchaseOrders");
 const cropsRoutes = require("./routes/crops");
+const farmRoutes = require("./routes/farmRoutes");
 
 const app = express(); // <-- app must be declared BEFORE using it
 
@@ -32,9 +32,7 @@ app.use("/api/ai", aiRoutes);
 //\ 
 
 // Farm routes
-app.get("/api/farms", farmController.getAllFarms);
-app.post("/api/farms", farmController.createFarm);
-app.get("/api/farms/:id", farmController.getFarmById);
+app.use("/api/farms", farmRoutes);
 
 // Crop routes
 app.use("/api/crops", cropsRoutes);
@@ -48,8 +46,6 @@ app.use('/api/purchaseOrders', purchaseOrdersRoutes);
 
 // Farmer routes
 app.use("/api/farmers", farmerRoutes);
-// Vendor routes
-app.use("/api/vendors", vendorRoutes);
 // Cooperative routes
 app.use("/api/cooperatives", cooperativeRoutes);
 app.get("/api/cooperatives/:id", cooperativeController.getCooperativeById);

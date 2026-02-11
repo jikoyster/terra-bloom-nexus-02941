@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,7 +17,8 @@ import AdminPanel from '@/components/dashboard/AdminPanel';
 //import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
 const Dashboard = () => {
-  const [activeView, setActiveView] = useState('farms');
+  const [activeView, setActiveView] = useState('agriRegistry');
+  const [agriWeatherStatus, setAgriWeatherStatus] = useState('Loading weather data...');
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
     { id: 2, type: 'request', message: '3 loan applications pending approval', priority: 'medium' },
@@ -26,19 +27,53 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchAgriWeather = async () => {
+      try {
+        // Fetch PAGASA weather data
+        const response = await fetch('https://pagasa.dost.gov.ph/');
+        const htmlText = await response.text();
+        
+        // Parse HTML to extract weather/advisory information
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, 'text/html');
+        
+        // Look for weather advisory or condition text
+        const weatherElements = doc.querySelectorAll('[class*="advisory"], [class*="weather"], [class*="forecast"]');
+        let weatherStatus = 'Fair Weather';
+        
+        if (weatherElements.length > 0) {
+          const firstElement = weatherElements[0];
+          if (firstElement.textContent) {
+            weatherStatus = firstElement.textContent.trim().substring(0, 100);
+          }
+        }
+        
+        setAgriWeatherStatus(weatherStatus || 'PAGASA Weather Status');
+      } catch (error) {
+        console.error('Error fetching PAGASA weather:', error);
+        
+        // Fallback: Use a weather API or seasonal data
+        const month = new Date().getMonth() + 1;
+        let season = 'Wet/Rainy Season';
+        
+        if (month >= 12 || month <= 2) season = "Cool Dry Season - Optimal for crops";
+        if (month >= 3 && month <= 5) season = "Hot Dry Season - Monitor irrigation";
+        
+        setAgriWeatherStatus(`Seasonal: ${season}`);
+      }
+    };
+
+    fetchAgriWeather();
+    // Refresh weather every 30 minutes
+    const interval = setInterval(fetchAgriWeather, 30 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
-
-  const getPhilippineSeason = () => {
-    const month = new Date().getMonth() + 1;
-
-    if (month >= 12 || month <= 2) return "Cool Dry Season";
-    if (month >= 3 && month <= 5) return "Hot Dry Season";
-    return "Wet/Rainy Season";
-  };
-  const season = getPhilippineSeason();
 
   return (
     <div className="min-h-screen bg-background">
@@ -61,7 +96,7 @@ const Dashboard = () => {
               <h2 className="text-xl font-bold text-foreground">{/*add your desc here*/}</h2>
               <div className="flex items-center gap-4 mt-1">
                 <span className="text-sm text-muted-foreground"> {/*add your desc here*/} </span>
-                <Badge variant="outline">Season: {season}</Badge>
+                <Badge variant="outline">🌤️ {agriWeatherStatus}</Badge>
                 
               </div>
             </div>
@@ -95,7 +130,7 @@ const Dashboard = () => {
 
       {/* Navigation Tabs */}
       <div className="container mx-auto px-5 py-4">
-        <Tabs defaultValue="overview" value={activeView} onValueChange={setActiveView} className="w-full">
+        <Tabs defaultValue="agriRegistry" value={activeView} onValueChange={setActiveView} className="w-full">
           <TabsList className="grid w-full grid-cols-1  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2">
             <TabsTrigger value="overview" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Overview</TabsTrigger>
             <TabsTrigger value="agriRegistry" className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Agri Registry</TabsTrigger>
