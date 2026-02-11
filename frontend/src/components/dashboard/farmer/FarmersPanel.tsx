@@ -16,7 +16,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, EyeOff } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { AlertCircle, Plus, Edit, Delete } from "lucide-react";
 
 interface Farmer {
   id: number;
@@ -33,6 +36,19 @@ const FarmersPanel = () => {
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [loading, setLoading] = useState(true);
   const [showRevenue, setShowRevenue] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [editingFarmer, setEditingFarmer] = useState<Farmer | null>(null);
+  const [deletingFarmer, setDeletingFarmer] = useState<Farmer | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    products: '',
+    status: 'Verified',
+    address: '',
+    email: ''
+  });
 
   useEffect(() => {
     const fetchFarmers = async () => {
@@ -52,6 +68,122 @@ const FarmersPanel = () => {
     fetchFarmers();
   }, []);
 
+  const resetCreateForm = () => {
+    setFormData({
+      name: '',
+      products: '',
+      status: 'Verified',
+      address: '',
+      email: ''
+    });
+    setError(null);
+  };
+
+  const handleCreateFarmer = async () => {
+    try {
+      if (!formData.name || !formData.email) {
+        setError('Farmer name and email are required');
+        return;
+      }
+
+      const payload = {
+        name: formData.name,
+        products: formData.products || null,
+        status: formData.status || 'Verified',
+        address: formData.address || null,
+        email: formData.email
+      };
+
+      const response = await fetch('http://localhost:5000/api/farmers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error('Failed to create farmer');
+      
+      const newFarmer = await response.json();
+      setFarmers([...farmers, newFarmer]);
+      setIsCreateDialogOpen(false);
+      resetCreateForm();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error creating farmer:', err);
+    }
+  };
+
+  const handleEditFarmer = (farmer: Farmer) => {
+    setEditingFarmer(farmer);
+    setFormData({
+      name: farmer.name || '',
+      products: farmer.products || '',
+      status: farmer.status || 'Verified',
+      address: farmer.address || '',
+      email: farmer.email || ''
+    });
+    setError(null);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateFarmer = async () => {
+    try {
+      if (!editingFarmer) return;
+      if (!formData.name || !formData.email) {
+        setError('Farmer name and email are required');
+        return;
+      }
+
+      const payload = {
+        name: formData.name,
+        products: formData.products || null,
+        status: formData.status || 'Verified',
+        address: formData.address || null,
+        email: formData.email
+      };
+
+      const response = await fetch(`http://localhost:5000/api/farmers/${editingFarmer.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error('Failed to update farmer');
+      
+      const updatedFarmer = await response.json();
+      setFarmers(farmers.map(f => f.id === editingFarmer.id ? updatedFarmer : f));
+      setIsEditDialogOpen(false);
+      setEditingFarmer(null);
+      resetCreateForm();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error updating farmer:', err);
+    }
+  };
+
+  const handleDeleteClick = (farmer: Farmer) => {
+    setDeletingFarmer(farmer);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteFarmer = async () => {
+    try {
+      if (!deletingFarmer) return;
+
+      const response = await fetch(`http://localhost:5000/api/farmers/${deletingFarmer.id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) throw new Error('Failed to delete farmer');
+      
+      setFarmers(farmers.filter(f => f.id !== deletingFarmer.id));
+      setIsDeleteDialogOpen(false);
+      setDeletingFarmer(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error deleting farmer:', err);
+    }
+  };
+
   // Example calculations (you can replace these with real formulas later)
   const activeFarmers = farmers.filter((f) => f.status === "Verified").length;
 
@@ -61,15 +193,205 @@ const FarmersPanel = () => {
       : 0;
 
   if (loading) return <p>Loading farmers...</p>;
-  if (!farmers.length) return <p>No farmers found.</p>;
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">&nbsp;</h2>
+      {/* DELETE FARMER CONFIRMATION DIALOG */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Farmer</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deletingFarmer?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-end gap-2">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteFarmer}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        
+      {/* CREATE FARMER DIALOG */}
+      <div className="flex justify-end mb-4">
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button 
+              onClick={() => {
+                resetCreateForm();
+                setIsCreateDialogOpen(true);
+              }}
+              className="gap-2 bg-green-600 hover:bg-green-700"
+            >
+              <Plus className="w-4 h-4" />
+              Add Farmer
+            </Button>
+          </DialogTrigger>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create New Farmer</DialogTitle>
+            <DialogDescription>Add a new farmer to the system</DialogDescription>
+          </DialogHeader>
+          
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              <p className="text-red-800">{error}</p>
+            </div>
+          )}
+
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Farmer Name *</label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter farmer name"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Email *</label>
+              <Input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Enter email address"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Products</label>
+              <Input
+                value={formData.products}
+                onChange={(e) => setFormData({ ...formData, products: e.target.value })}
+                placeholder="e.g., Rice, Corn, Vegetables"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Address</label>
+              <Input
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="Enter address"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="border rounded-md p-2 text-sm"
+              >
+                <option value="Verified">Verified</option>
+                <option value="Pending">Pending</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateFarmer}
+              disabled={!formData.name || !formData.email}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Create Farmer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
+
+      {/* EDIT FARMER DIALOG */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Farmer</DialogTitle>
+            <DialogDescription>Update farmer details</DialogDescription>
+          </DialogHeader>
+          
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              <p className="text-red-800">{error}</p>
+            </div>
+          )}
+
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Farmer Name *</label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter farmer name"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Email *</label>
+              <Input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Enter email address"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Products</label>
+              <Input
+                value={formData.products}
+                onChange={(e) => setFormData({ ...formData, products: e.target.value })}
+                placeholder="e.g., Rice, Corn, Vegetables"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Address</label>
+              <Input
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="Enter address"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="border rounded-md p-2 text-sm"
+              >
+                <option value="Verified">Verified</option>
+                <option value="Pending">Pending</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateFarmer}
+              disabled={!formData.name || !formData.email}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Update Farmer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -78,8 +400,8 @@ const FarmersPanel = () => {
             <CardTitle className="text-sm font-medium">Total Farmers</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{farmers.length}</div>
-            <div className="text-xs text-muted-foreground">Registered</div>
+            <div className="text-2xl font-bold">{activeFarmers}</div>
+            <div className="text-xs text-muted-foreground">Verified</div>
           </CardContent>
         </Card>
 
@@ -114,28 +436,54 @@ const FarmersPanel = () => {
                 <TableHead>Address</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Created At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {farmers.map((farmer) => (
-                <TableRow key={farmer.id}>
-                  <TableCell className="text-green-700 font-medium text-[1.1em]">
-                    {farmer.name}
-                  </TableCell>
+              {farmers.length > 0 ? (
+                farmers.map((farmer) => (
+                  <TableRow key={farmer.id}>
+                    <TableCell className="text-green-700 font-medium text-[1.1em]">
+                      {farmer.name}
+                    </TableCell>
 
-                  <TableCell>{farmer.products || "-"}</TableCell>
-                  
-                  <TableCell>{farmer.status}</TableCell>
-                  <TableCell>{farmer.address || "-"}</TableCell>
-                  <TableCell>{farmer.email || "-"}</TableCell>
-                  <TableCell>
-                    {new Date(farmer.created_at).toLocaleDateString()}
-                  </TableCell>
+                    <TableCell>{farmer.products || "-"}</TableCell>
+                    
+                    <TableCell>{farmer.status}</TableCell>
+                    <TableCell>{farmer.address || "-"}</TableCell>
+                    <TableCell>{farmer.email || "-"}</TableCell>
+                    <TableCell>
+                      {new Date(farmer.created_at).toLocaleDateString()}
+                    </TableCell>
 
-                  
+                    <TableCell className="text-right">
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => handleEditFarmer(farmer)}
+                          className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                          title="Edit"
+                        >
+                          <Edit className="h-4 w-4 text-blue-600 cursor-pointer" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(farmer)}
+                          className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                          title="Delete"
+                        >
+                          <Delete className="h-4 w-4 text-red-600 cursor-pointer" />
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    No farmers found. Click "Add Farmer" to create one.
+                  </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>

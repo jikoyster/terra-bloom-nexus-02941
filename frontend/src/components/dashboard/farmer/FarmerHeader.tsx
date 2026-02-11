@@ -1,10 +1,27 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Bell, User, MapPin, Sprout } from 'lucide-react';
 
 const FarmerHeader = () => {
+  const [verifiedFarmersCount, setVerifiedFarmersCount] = useState(0);
+
+  useEffect(() => {
+    const fetchVerifiedFarmers = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/farmers');
+        if (!res.ok) throw new Error('Failed to fetch farmers');
+        const data = await res.json();
+        const verifiedCount = data.filter((farmer: any) => farmer.status === 'Verified').length;
+        setVerifiedFarmersCount(verifiedCount);
+      } catch (err) {
+        console.error('Error fetching verified farmers:', err);
+      }
+    };
+
+    fetchVerifiedFarmers();
+  }, []);
   return (
     <header className="border-b bg-card shadow-sm">
       <div className="container mx-auto px-4 py-4">
@@ -27,7 +44,7 @@ const FarmerHeader = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                Current: Wet Season 2024
+                Total Farmers: {verifiedFarmersCount}
               </Badge>
               <Badge variant="secondary">Maize Crop</Badge>
             </div>
