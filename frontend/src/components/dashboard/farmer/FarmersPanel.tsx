@@ -20,7 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { AlertCircle, Plus, Edit, ArchiveIcon } from "lucide-react";
+import { AlertCircle, Plus, Edit, ArchiveIcon, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 interface Farmer {
   id: number;
@@ -44,6 +44,8 @@ const FarmersPanel = () => {
   const [editingFarmer, setEditingFarmer] = useState<Farmer | null>(null);
   const [deletingFarmer, setDeletingFarmer] = useState<Farmer | null>(null);
   const [togglingFarmerId, setTogglingFarmerId] = useState<number | null>(null);
+  const [sortColumn, setSortColumn] = useState<keyof Farmer | null>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [formData, setFormData] = useState({
     name: '',
     products: '',
@@ -59,7 +61,11 @@ const FarmersPanel = () => {
         if (!res.ok) throw new Error("Failed to fetch farmers");
 
         const data: Farmer[] = await res.json();
-        setFarmers(data);
+        // Sort by name in ascending order
+        const sortedData = data.sort((a, b) => {
+          return a.name.localeCompare(b.name);
+        });
+        setFarmers(sortedData);
       } catch (err) {
         console.error("Error fetching farmers:", err);
       } finally {
@@ -105,7 +111,9 @@ const FarmersPanel = () => {
       if (!response.ok) throw new Error('Failed to create farmer');
       
       const newFarmer = await response.json();
-      setFarmers([...farmers, newFarmer]);
+      setFarmers([...farmers, newFarmer].sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      }));
       setIsCreateDialogOpen(false);
       resetCreateForm();
     } catch (err) {
@@ -152,7 +160,9 @@ const FarmersPanel = () => {
       if (!response.ok) throw new Error('Failed to update farmer');
       
       const updatedFarmer = await response.json();
-      setFarmers(farmers.map(f => f.id === editingFarmer.id ? updatedFarmer : f));
+      setFarmers(farmers.map(f => f.id === editingFarmer.id ? updatedFarmer : f).sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      }));
       setIsEditDialogOpen(false);
       setEditingFarmer(null);
       resetCreateForm();
@@ -220,7 +230,9 @@ const FarmersPanel = () => {
       
       const updatedFarmer = await response.json();
       console.log('Farmer updated:', updatedFarmer);
-      setFarmers(farmers.map(f => f.id === farmer.id ? updatedFarmer : f));
+      setFarmers(farmers.map(f => f.id === farmer.id ? updatedFarmer : f).sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      }));
     } catch (err) {
       console.error('Error toggling farmer status:', err);
       setError(err instanceof Error ? err.message : 'Failed to toggle status');
@@ -236,6 +248,68 @@ const FarmersPanel = () => {
     farmers.length > 0
       ? Math.min((activeFarmers / farmers.length) * 100, 100)
       : 0;
+
+  const handleSort = (column: keyof Farmer) => {
+    if (sortColumn === column) {
+      // Toggle direction if clicking same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new column and default to ascending
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortedFarmers = () => {
+    if (!sortColumn) return farmers;
+
+    return [...farmers].sort((a, b) => {
+      const aVal = a[sortColumn];
+      const bVal = b[sortColumn];
+
+      // Handle null/undefined values
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return sortDirection === 'asc' ? 1 : -1;
+      if (bVal == null) return sortDirection === 'asc' ? -1 : 1;
+
+      // Handle date columns
+      if (sortColumn === 'created_at' || sortColumn === 'updated_at') {
+        const dateA = new Date(aVal as string).getTime();
+        const dateB = new Date(bVal as string).getTime();
+        return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+
+      // Handle string columns
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        const comparison = aVal.localeCompare(bVal);
+        return sortDirection === 'asc' ? comparison : -comparison;
+      }
+
+      // Handle numeric columns
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      return 0;
+    });
+  };
+
+  const SortIcon = ({ column }: { column: keyof Farmer }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="w-4 h-4 opacity-40" />;
+    return sortDirection === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
+  };
+
+  const SortableHeader = ({ column, label }: { column: keyof Farmer; label: string }) => (
+    <TableHead 
+      onClick={() => handleSort(column)}
+      className="cursor-pointer hover:bg-gray-100 transition-colors"
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        <SortIcon column={column} />
+      </div>
+    </TableHead>
+  );
 
   if (loading) return <p>Loading farmers...</p>;
 
@@ -475,19 +549,19 @@ const FarmersPanel = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Products</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Created At</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <SortableHeader column="name" label="Name" />
+                <SortableHeader column="products" label="Products" />
+                <SortableHeader column="address" label="Address" />
+                <SortableHeader column="email" label="Email" />
+                <SortableHeader column="created_at" label="Created At" />
+                <SortableHeader column="status" label="Status" />
+                <TableHead className="text-right cursor-default">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {farmers.length > 0 ? (
-                farmers.map((farmer) => (
+                getSortedFarmers().map((farmer) => (
                   <TableRow key={farmer.id ? `farmer-${farmer.id}` : `temp-${Math.random()}`}>
                     <TableCell className="text-green-700 font-medium text-[1.1em]">
                       {farmer.name}

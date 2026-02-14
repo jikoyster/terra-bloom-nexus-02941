@@ -88,7 +88,11 @@ const FarmsPanel = () => {
       if (!response.ok) throw new Error('Failed to create farm');
       
       const newFarm = await response.json();
-      setFarms([...farms, newFarm]);
+      setFarms([...farms, newFarm].sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return dateB - dateA;
+      }));
       setIsCreateDialogOpen(false);
       resetCreateForm();
     } catch (err) {
@@ -139,7 +143,11 @@ const FarmsPanel = () => {
       if (!response.ok) throw new Error('Failed to update farm');
       
       const updatedFarm = await response.json();
-      setFarms(farms.map(f => f.farm_id === editingFarm.farm_id ? updatedFarm : f));
+      setFarms(farms.map(f => f.farm_id === editingFarm.farm_id ? updatedFarm : f).sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return dateB - dateA;
+      }));
       setIsEditDialogOpen(false);
       setEditingFarm(null);
       resetCreateForm();
@@ -179,7 +187,13 @@ const FarmsPanel = () => {
         const res = await fetch('http://localhost:5000/api/farms');
         if (!res.ok) throw new Error('Failed to fetch farms');
         const data: Farm[] = await res.json();
-        setFarms(data);
+        // Sort by created_at in descending order (newest first)
+        const sortedData = data.sort((a, b) => {
+          const dateA = new Date(a.created_at).getTime();
+          const dateB = new Date(b.created_at).getTime();
+          return dateB - dateA;
+        });
+        setFarms(sortedData);
       } catch (err) {
         console.error('Error fetching farms:', err);
       } finally {
