@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input';
 
 import FarmDetails from './FarmDetails';
-import { AlertCircle, Plus, Edit, ArchiveIcon, SquareArrowOutUpRight } from 'lucide-react';
+import { AlertCircle, Plus, Edit, ArchiveIcon, SquareArrowOutUpRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface Farm {
   created_at: string | number | Date;
@@ -33,7 +33,9 @@ const FarmsPanel = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingFarm, setEditingFarm] = useState<Farm | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deletingFarm, setDeletingFarm] = useState<Farm | null>(null);
+  const [deletingFarm, setDeleteFarm] = useState<Farm | null>(null);
+  const [sortColumn, setSortColumn] = useState<keyof Farm | null>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [formData, setFormData] = useState({
     name: '',
     region: '',
@@ -89,9 +91,7 @@ const FarmsPanel = () => {
       
       const newFarm = await response.json();
       setFarms([...farms, newFarm].sort((a, b) => {
-        const dateA = new Date(a.created_at).getTime();
-        const dateB = new Date(b.created_at).getTime();
-        return dateB - dateA;
+        return a.name.localeCompare(b.name);
       }));
       setIsCreateDialogOpen(false);
       resetCreateForm();
@@ -144,9 +144,7 @@ const FarmsPanel = () => {
       
       const updatedFarm = await response.json();
       setFarms(farms.map(f => f.farm_id === editingFarm.farm_id ? updatedFarm : f).sort((a, b) => {
-        const dateA = new Date(a.created_at).getTime();
-        const dateB = new Date(b.created_at).getTime();
-        return dateB - dateA;
+        return a.name.localeCompare(b.name);
       }));
       setIsEditDialogOpen(false);
       setEditingFarm(null);
@@ -158,7 +156,7 @@ const FarmsPanel = () => {
   };
 
   const handleDeleteClick = (farm: Farm) => {
-    setDeletingFarm(farm);
+    setDeleteFarm(farm);
     setIsDeleteDialogOpen(true);
   };
 
@@ -174,7 +172,7 @@ const FarmsPanel = () => {
       
       setFarms(farms.filter(f => f.farm_id !== deletingFarm.farm_id));
       setIsDeleteDialogOpen(false);
-      setDeletingFarm(null);
+      setDeleteFarm(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Error deleting farm:', err);
@@ -187,11 +185,9 @@ const FarmsPanel = () => {
         const res = await fetch('http://localhost:5000/api/farms');
         if (!res.ok) throw new Error('Failed to fetch farms');
         const data: Farm[] = await res.json();
-        // Sort by created_at in descending order (newest first)
+        // Sort by name in ascending order by default
         const sortedData = data.sort((a, b) => {
-          const dateA = new Date(a.created_at).getTime();
-          const dateB = new Date(b.created_at).getTime();
-          return dateB - dateA;
+          return a.name.localeCompare(b.name);
         });
         setFarms(sortedData);
       } catch (err) {
@@ -206,6 +202,68 @@ const FarmsPanel = () => {
 
   if (loading) return <p>Loading farms...</p>;
   if (!farms.length) return <p>No farms available.</p>;
+
+  const handleSort = (column: keyof Farm) => {
+    if (sortColumn === column) {
+      // Toggle direction if clicking same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new column and default to ascending
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortedFarms = () => {
+    if (!sortColumn) return farms;
+
+    return [...farms].sort((a, b) => {
+      const aVal = a[sortColumn];
+      const bVal = b[sortColumn];
+
+      // Handle null/undefined values
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return sortDirection === 'asc' ? 1 : -1;
+      if (bVal == null) return sortDirection === 'asc' ? -1 : 1;
+
+      // Handle date columns
+      if (sortColumn === 'created_at') {
+        const dateA = new Date(aVal as string).getTime();
+        const dateB = new Date(bVal as string).getTime();
+        return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+
+      // Handle string columns
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        const comparison = aVal.localeCompare(bVal);
+        return sortDirection === 'asc' ? comparison : -comparison;
+      }
+
+      // Handle numeric columns
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      return 0;
+    });
+  };
+
+  const SortIcon = ({ column }: { column: keyof Farm }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="w-4 h-4 opacity-40" />;
+    return sortDirection === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
+  };
+
+  const SortableHeader = ({ column, label }: { column: keyof Farm; label: string }) => (
+    <TableHead 
+      onClick={() => handleSort(column)}
+      className="cursor-pointer hover:bg-gray-100 transition-colors"
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        <SortIcon column={column} />
+      </div>
+    </TableHead>
+  );
 
   return (
     <div className="space-y-6">
@@ -463,18 +521,18 @@ const FarmsPanel = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Farm Name</TableHead>
-                <TableHead>Region</TableHead>
-                <TableHead>Crops</TableHead>
-                <TableHead>Yield</TableHead>
-                <TableHead>Size (ha)</TableHead>
-                <TableHead className='w-[10%] text-center'>Farm Transactions</TableHead> 
-                <TableHead className='w-[10%] text-center'> </TableHead> 
+                <SortableHeader column="name" label="Farm Name" />
+                <SortableHeader column="region" label="Region" />
+                <SortableHeader column="crops" label="Crops" />
+                <SortableHeader column="yield" label="Yield" />
+                <SortableHeader column="hectares" label="Size (ha)" />
+                <TableHead className='w-[10%] text-center cursor-default'>Farm Transactions</TableHead> 
+                <TableHead className='w-[10%] text-center cursor-default'> </TableHead> 
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {farms.map((farm) => (
+              {getSortedFarms().map((farm) => (
                 <TableRow key={farm.farm_id}>
                   
                   {/* Farm name – clickable */}
