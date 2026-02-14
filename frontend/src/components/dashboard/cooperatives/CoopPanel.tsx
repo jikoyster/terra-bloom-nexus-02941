@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { AlertCircle, Plus, Edit, Delete, Trash2Icon, ArchiveIcon } from "lucide-react";
+import { AlertCircle, Plus, Edit, Delete, Trash2Icon, ArchiveIcon, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 import {
   Card,
@@ -47,6 +47,8 @@ const CoopPanel: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingCoop, setEditingCoop] = useState<Cooperative | null>(null);
   const [deletingCoop, setDeletingCoop] = useState<Cooperative | null>(null);
+  const [sortColumn, setSortColumn] = useState<keyof Cooperative | null>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [formData, setFormData] = useState({
     name: '',
     registration_no: '',
@@ -64,9 +66,12 @@ const CoopPanel: React.FC = () => {
       try {
         const res = await fetch("http://localhost:5000/api/cooperatives");
         if (!res.ok) throw new Error("Failed to fetch cooperatives");
-
         const data: Cooperative[] = await res.json();
-        setCoops(data);
+        // Sort by name in ascending order by default
+        const sortedData = data.sort((a, b) => {
+          return a.name.localeCompare(b.name);
+        });
+        setCoops(sortedData);
       } catch (err) {
         console.error("Error fetching cooperatives:", err);
       } finally {
@@ -120,7 +125,9 @@ const CoopPanel: React.FC = () => {
       if (!response.ok) throw new Error('Failed to create cooperative');
       
       const newCoop = await response.json();
-      setCoops([...coops, newCoop]);
+      setCoops([...coops, newCoop].sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      }));
       setIsCreateDialogOpen(false);
       resetCreateForm();
     } catch (err) {
@@ -175,7 +182,9 @@ const CoopPanel: React.FC = () => {
       if (!response.ok) throw new Error('Failed to update cooperative');
       
       const updatedCoop = await response.json();
-      setCoops(coops.map(c => c.coop_id === editingCoop.coop_id ? updatedCoop : c));
+      setCoops(coops.map(c => c.coop_id === editingCoop.coop_id ? updatedCoop : c).sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      }));
       setIsEditDialogOpen(false);
       setEditingCoop(null);
       resetCreateForm();
@@ -210,6 +219,68 @@ const CoopPanel: React.FC = () => {
   };
 
   const activateCoops = coops.filter((c) => c.status === "Active").length;
+
+  const handleSort = (column: keyof Cooperative) => {
+    if (sortColumn === column) {
+      // Toggle direction if clicking same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new column and default to ascending
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortedCoops = () => {
+    if (!sortColumn) return coops;
+
+    return [...coops].sort((a, b) => {
+      const aVal = a[sortColumn];
+      const bVal = b[sortColumn];
+
+      // Handle null/undefined values
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return sortDirection === 'asc' ? 1 : -1;
+      if (bVal == null) return sortDirection === 'asc' ? -1 : 1;
+
+      // Handle date columns
+      if (sortColumn === 'created_at' || sortColumn === 'updated_at' || sortColumn === 'established_at') {
+        const dateA = new Date(aVal as string).getTime();
+        const dateB = new Date(bVal as string).getTime();
+        return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+
+      // Handle string columns
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        const comparison = aVal.localeCompare(bVal);
+        return sortDirection === 'asc' ? comparison : -comparison;
+      }
+
+      // Handle numeric columns
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      return 0;
+    });
+  };
+
+  const SortIcon = ({ column }: { column: keyof Cooperative }) => {
+    if (sortColumn !== column) return <ArrowUpDown className="w-4 h-4 opacity-40" />;
+    return sortDirection === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
+  };
+
+  const SortableHeader = ({ column, label }: { column: keyof Cooperative; label: string }) => (
+    <TableHead 
+      onClick={() => handleSort(column)}
+      className="cursor-pointer hover:bg-gray-100 transition-colors"
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        <SortIcon column={column} />
+      </div>
+    </TableHead>
+  );
 
   if (loading) return <p>Loading cooperatives...</p>;
 
@@ -514,24 +585,20 @@ const CoopPanel: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Registration No.</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Region</TableHead>
-                <TableHead>
-                  Contact Person/
-                  Phone/
-                  Email
-                </TableHead>
-                <TableHead>Established</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <SortableHeader column="name" label="Name" />
+                <SortableHeader column="registration_no" label="Registration No." />
+                <SortableHeader column="address" label="Address" />
+                <SortableHeader column="region" label="Region" />
+                <TableHead className="cursor-default">Contact Person/Phone/Email</TableHead>
+                <SortableHeader column="established_at" label="Established" />
+                <SortableHeader column="status" label="Status" />
+                <TableHead className="text-right cursor-default">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {coops.length > 0 ? (
-                coops.map((coop) => (
+                getSortedCoops().map((coop) => (
                   <TableRow key={coop.coop_id}>
                     <TableCell className='text-[1em] w-[12%] font-medium text-green-700'>{coop.name}</TableCell>
                     <TableCell>{coop.registration_no || "-"}</TableCell>
