@@ -19,7 +19,8 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { AlertCircle, Plus, Edit, Delete } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { AlertCircle, Plus, Edit, ArchiveIcon } from "lucide-react";
 
 interface Farmer {
   id: number;
@@ -42,6 +43,7 @@ const FarmersPanel = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingFarmer, setEditingFarmer] = useState<Farmer | null>(null);
   const [deletingFarmer, setDeletingFarmer] = useState<Farmer | null>(null);
+  const [togglingFarmerId, setTogglingFarmerId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     products: '',
@@ -181,6 +183,49 @@ const FarmersPanel = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Error deleting farmer:', err);
+    }
+  };
+
+  const handleToggleStatus = async (farmer: Farmer) => {
+    try {
+      // Check if farmer has valid ID
+      if (!farmer || !farmer.id) {
+        setError('Invalid farmer data. Please refresh and try again.');
+        return;
+      }
+      
+      // Prevent multiple rapid clicks
+      if (togglingFarmerId === farmer.id) return;
+      
+      setTogglingFarmerId(farmer.id);
+      const newStatus = farmer.status === 'Verified' ? 'Unverified' : 'Verified';
+      console.log(`Toggling farmer ${farmer.id} status to ${newStatus}`);
+      
+      const response = await fetch(`http://localhost:5000/api/farmers/${farmer.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: farmer.name,
+          products: farmer.products || null,
+          status: newStatus,
+          address: farmer.address || null,
+          email: farmer.email
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update farmer status: ${errorText}`);
+      }
+      
+      const updatedFarmer = await response.json();
+      console.log('Farmer updated:', updatedFarmer);
+      setFarmers(farmers.map(f => f.id === farmer.id ? updatedFarmer : f));
+    } catch (err) {
+      console.error('Error toggling farmer status:', err);
+      setError(err instanceof Error ? err.message : 'Failed to toggle status');
+    } finally {
+      setTogglingFarmerId(null);
     }
   };
 
@@ -432,10 +477,10 @@ const FarmersPanel = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Products</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Address</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Created At</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -443,18 +488,31 @@ const FarmersPanel = () => {
             <TableBody>
               {farmers.length > 0 ? (
                 farmers.map((farmer) => (
-                  <TableRow key={farmer.id}>
+                  <TableRow key={farmer.id ? `farmer-${farmer.id}` : `temp-${Math.random()}`}>
                     <TableCell className="text-green-700 font-medium text-[1.1em]">
                       {farmer.name}
                     </TableCell>
 
                     <TableCell>{farmer.products || "-"}</TableCell>
                     
-                    <TableCell>{farmer.status}</TableCell>
                     <TableCell>{farmer.address || "-"}</TableCell>
                     <TableCell>{farmer.email || "-"}</TableCell>
                     <TableCell>
                       {new Date(farmer.created_at).toLocaleDateString()}
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div 
+                        className="flex items-center gap-2 cursor-pointer opacity-75 hover:opacity-100 transition-opacity"
+                        onClick={() => handleToggleStatus(farmer)}
+                      >
+                        <div className={`w-10 h-6 rounded-full transition-colors ${farmer.status === 'Verified' ? 'bg-green-600' : 'bg-gray-300'} ${togglingFarmerId === farmer.id ? 'opacity-50' : ''}`}>
+                          <div className={`w-5 h-5 rounded-full bg-white transition-transform ${farmer.status === 'Verified' ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`}></div>
+                        </div>
+                        <span className="text-sm font-medium">
+                          {togglingFarmerId === farmer.id ? 'Updating...' : (farmer.status === 'Verified' ? 'Verified' : 'Unverified')}
+                        </span>
+                      </div>
                     </TableCell>
 
                     <TableCell className="text-right">
@@ -469,9 +527,9 @@ const FarmersPanel = () => {
                         <button
                           onClick={() => handleDeleteClick(farmer)}
                           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-                          title="Delete"
+                          title="Archive"
                         >
-                          <Delete className="h-4 w-4 text-red-600 cursor-pointer" />
+                          <ArchiveIcon className="h-4 w-4 text-amber-600 cursor-pointer" />
                         </button>
                       </div>
                     </TableCell>

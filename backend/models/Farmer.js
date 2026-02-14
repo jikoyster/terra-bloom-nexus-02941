@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const Farmers = sequelize.define(
     "Farmer",
     {
-      farmer_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, field: 'farmer_id' },
       name: { type: DataTypes.STRING, allowNull: false },
       products: { type: DataTypes.TEXT, allowNull: true },
       status: { type: DataTypes.STRING, allowNull: true },

@@ -6,10 +6,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input';
-import { AlertCircle } from 'lucide-react';
 
 import FarmDetails from './FarmDetails';
-import { Bell, Delete, Edit, SquareArrowOutUpRight, Plus } from 'lucide-react';
+import { AlertCircle, Plus, Edit, ArchiveIcon, SquareArrowOutUpRight } from 'lucide-react';
 
 interface Farm {
   created_at: string | number | Date;
@@ -503,7 +502,7 @@ const FarmsPanel = () => {
                   </TableCell>
                   <TableCell className='flex justify-center'>
                     <div title="Edit Farm" onClick={() => handleEditFarm(farm)} className="cursor-pointer"><Edit className="h-5 w-5 text-gray-600 hover:text-gray-800" /></div>
-                    <div title="Delete Farm" onClick={() => handleDeleteClick(farm)} className="cursor-pointer"><Delete className="h-5 w-5 text-red-600 hover:text-red-800 ml-4" /></div>
+                    <div title="Archive Farm" onClick={() => handleDeleteClick(farm)} className="cursor-pointer"><ArchiveIcon className="h-5 w-5 text-amber-600 hover:text-amber-800 ml-4" /></div>
                   </TableCell>
                 </TableRow>
               ))}

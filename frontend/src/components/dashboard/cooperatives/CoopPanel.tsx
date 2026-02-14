@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { AlertCircle, Plus, Edit, Delete } from "lucide-react";
+import { AlertCircle, Plus, Edit, Delete, Trash2Icon, ArchiveIcon } from "lucide-react";
 
 import {
   Card,
@@ -560,9 +560,9 @@ const CoopPanel: React.FC = () => {
                         <button
                           onClick={() => handleDeleteClick(coop)}
                           className="p-2 hover:bg-gray-100 rounded-md transition-colors"
-                          title="Delete"
+                          title="Archive"
                         >
-                          <Delete className="h-4 w-4 text-red-600 cursor-pointer" />
+                          <ArchiveIcon className="h-4 w-4 text-amber-600 cursor-pointer" />
                         </button>
                       </div>
                     </TableCell>

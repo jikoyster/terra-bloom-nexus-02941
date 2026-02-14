@@ -8,4 +8,10 @@ router.get('/', farmerController.getAllFarmers);
 // POST create farmer
 router.post('/', farmerController.createFarmer);
 
+// PUT update farmer
+router.put('/:id', farmerController.updateFarmer);
+
+// DELETE farmer
+router.delete('/:id', farmerController.deleteFarmer);
+
 module.exports = router;
