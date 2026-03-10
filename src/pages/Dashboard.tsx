@@ -95,10 +95,7 @@ const Dashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="farms" className="flex items-center gap-2">
               <Tractor className="h-4 w-4" />
-              <span className="flex flex-col items-start leading-tight">
-                <span>Farms</span>
-                <span className="text-xs text-muted-foreground font-normal">Farmers</span>
-              </span>
+              Farms
             </TabsTrigger>
             <TabsTrigger value="vendors" className="flex items-center gap-2">
               <ShoppingBag className="h-4 w-4" />
