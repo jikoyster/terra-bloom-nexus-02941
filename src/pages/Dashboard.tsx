@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Users, ShoppingBag, Leaf, TrendingUp, Building2, Settings, Tractor } from 'lucide-react';
+import { Bell, Users, ShoppingBag, Leaf, TrendingUp, Building2, Settings, Tractor, LogOut } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import KPISummary from '@/components/dashboard/KPISummary';
 import FarmersPanel from '@/components/dashboard/FarmersPanel';
 import VendorMarketplace from '@/components/dashboard/VendorMarketplace';
