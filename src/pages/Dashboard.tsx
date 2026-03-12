@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Users, ShoppingBag, Leaf, TrendingUp, Building2, Settings, Tractor } from 'lucide-react';
+import { Bell, Users, ShoppingBag, Leaf, TrendingUp, Building2, Settings, Tractor, LogOut } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import KPISummary from '@/components/dashboard/KPISummary';
 import FarmersPanel from '@/components/dashboard/FarmersPanel';
 import VendorMarketplace from '@/components/dashboard/VendorMarketplace';
@@ -16,6 +17,7 @@ import AdminPanel from '@/components/dashboard/AdminPanel';
 import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState('overview');
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
@@ -30,12 +32,26 @@ const Dashboard = () => {
         {/* Top Bar - Logo and Home Link */}
         <div className="border-b border-border bg-background">
           <div className="container mx-auto px-6 py-3">
-            <Link to="/" className="flex items-center justify-center gap-3 hover:opacity-80 transition-opacity">
-              <Leaf className="h-6 w-6 text-green-600" />
-              <h1 className="text-2xl font-bold">
-                Terra<span className="text-green-600">Sync</span>
-              </h1>
-            </Link>
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <Leaf className="h-6 w-6 text-green-600" />
+                <h1 className="text-2xl font-bold">
+                  Terra<span className="text-green-600">Sync</span>
+                </h1>
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-muted-foreground hover:text-foreground"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate('/login');
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
         
