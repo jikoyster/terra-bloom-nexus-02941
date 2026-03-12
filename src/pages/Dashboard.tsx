@@ -32,12 +32,26 @@ const Dashboard = () => {
         {/* Top Bar - Logo and Home Link */}
         <div className="border-b border-border bg-background">
           <div className="container mx-auto px-6 py-3">
-            <Link to="/" className="flex items-center justify-center gap-3 hover:opacity-80 transition-opacity">
-              <Leaf className="h-6 w-6 text-green-600" />
-              <h1 className="text-2xl font-bold">
-                Terra<span className="text-green-600">Sync</span>
-              </h1>
-            </Link>
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <Leaf className="h-6 w-6 text-green-600" />
+                <h1 className="text-2xl font-bold">
+                  Terra<span className="text-green-600">Sync</span>
+                </h1>
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-muted-foreground hover:text-foreground"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate('/login');
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
         
