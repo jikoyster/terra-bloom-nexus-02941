@@ -19,11 +19,23 @@ import TradingPlatform from '@/components/dashboard/TradingPlatform';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState('overview');
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
     { id: 2, type: 'request', message: '3 loan applications pending approval', priority: 'medium' },
     { id: 3, type: 'vendor', message: 'New organic fertilizer vendor registered', priority: 'low' }
   ]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('profiles').select('display_name').eq('id', user.id).single();
+        if (data?.display_name) setDisplayName(data.display_name);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
