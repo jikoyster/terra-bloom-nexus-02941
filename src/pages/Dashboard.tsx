@@ -105,8 +105,8 @@ const Dashboard = () => {
                 </Button>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium">Manager: Ana Santos</p>
-                <p className="text-xs text-muted-foreground">Region: Bukidnon</p>
+                <p className="text-sm font-medium">{displayName || 'Manager'}</p>
+                <p className="text-xs text-muted-foreground">Co-op Manager</p>
               </div>
             </div>
           </div>
