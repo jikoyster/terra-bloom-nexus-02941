@@ -17,6 +17,7 @@ import AdminPanel from '@/components/dashboard/AdminPanel';
 import TradingPlatform from '@/components/dashboard/TradingPlatform';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState('overview');
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Pest outbreak detected in Sector 7', priority: 'high' },
