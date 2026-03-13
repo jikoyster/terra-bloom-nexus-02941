@@ -90,7 +90,38 @@ const Dashboard = () => {
             <TabsTrigger value="admin"><Users className="h-4 w-4" /> Admin</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-6"><KPISummary /></TabsContent>
+          <TabsContent value="overview" className="mt-6"><KPISummary />
+            <div className="space-y-6">
+              
+              
+              {/* Recent Activity */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Activity</CardTitle>
+                  <CardDescription>Latest updates from farmers and vendors</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {notifications.map((notification) => (
+                      <div key={notification.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            notification.priority === 'high' ? 'bg-destructive' :
+                            notification.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'
+                          }`} />
+                          <span className="text-sm">{notification.message}</span>
+                        </div>
+                        <Badge variant={notification.priority === 'high' ? 'destructive' : 'secondary'}>
+                          {notification.priority}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
           <TabsContent value="farmers" className="mt-6"><FarmersPanel /></TabsContent>
           <TabsContent value="vendors" className="mt-6"><VendorMarketplace /></TabsContent>
           <TabsContent value="erp" className="mt-6"><ERPLayer /></TabsContent>
