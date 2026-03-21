@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,7 +77,7 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => window.location.href = '/vendor-dashboard'}
+                  onClick={() => window.location.href = '/terra-bloom-nexus-02941/#/vendor-dashboard'}
                   className="ml-4"
                 >
                   Switch to Vendor View
@@ -86,7 +85,7 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => window.location.href = '/farmer-dashboard'}
+                  onClick={() => window.location.href = '/terra-bloom-nexus-02941/#/farmer-dashboard'}
                 >
                   Switch to Farmer View
                 </Button>
